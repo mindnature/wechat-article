@@ -1,0 +1,36 @@
+version: "0.6"
+policy:
+  source_rule: "Only user-confirmed samples may be used as voice exemplars."
+  unlabeled_history_is_not_reference: true
+  min_positive_samples_for_calibrated: 3
+  min_negative_samples_for_calibrated: 2
+
+accounts:
+  思然日新:
+    status: uncalibrated
+    positive: []
+    negative: []
+  思然知己:
+    status: uncalibrated
+    positive: []
+    negative: []
+  思然天工:
+    status: uncalibrated
+    positive: []
+    negative: []
+  思然经世:
+    status: uncalibrated
+    positive: []
+    negative: []
+  思然修远:
+    status: uncalibrated
+    positive: []
+    negative: []
+
+sample_schema:
+  sample_id: "VS-001"
+  source_ref: "user-confirmed file/article/paragraph"
+  label: positive_or_negative
+  function: "opening | transition | judgment | explanation | closing | rhythm"
+  excerpt: "exact user-approved excerpt"
+  why: "what specifically makes this like/unlike the author's voice"
