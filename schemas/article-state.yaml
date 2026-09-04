@@ -1,4 +1,4 @@
-version: "0.5"
+version: "0.6"
 article_id: ""
 account: ""
 created_at: ""
@@ -11,7 +11,7 @@ production:
   mode_reason: ""
 
 workflow:
-  stage: "signal" # signal | topic | research | author | architecture | writing | visual | qa | publishing | published | reviewed
+  stage: "signal" # signal | topic | research | author | architecture | writing | blind_review | visual | qa | publishing | published | reviewed
   gate: "ready" # ready | blocked | rework | manual_review
   blocked_by: []
   return_to: ""
@@ -20,11 +20,11 @@ workflow:
 signal:
   event: ""
   event_date: ""
-  freshness: "unknown" # breaking | rising | stable | fading | evergreen | unknown
-  scope: "unknown" # global | national | province | city | institution | company | single_case | unknown
+  freshness: "unknown"
+  scope: "unknown"
   source_ids: []
   duplicate_check:
-    status: "unchecked" # unchecked | clear | related | duplicate
+    status: "unchecked"
     related_article_ids: []
     note: ""
 
@@ -33,6 +33,14 @@ topic:
   core_angle: ""
   core_conflict: ""
   reader_value: ""
+  tension_test:
+    status: "unknown" # pass | weak | fail | unknown
+    contradiction: ""
+    unresolved_question: ""
+    decision_change: ""
+    exclusive_material_path: ""
+    strong_judgment_candidate: ""
+    note: ""
   market_score:
     demand: null
     urgency: null
@@ -42,50 +50,61 @@ topic:
     identity_match: null
     historical_fit: null
     actionability: null
-  evidence_confidence: "unknown" # high | medium | low | unknown
+  evidence_confidence: "unknown"
   competition:
-    status: "unverified" # verified | partial | unverified
-    level: "unknown" # low | medium | high | unknown
+    status: "unverified"
+    level: "unknown"
     scanned_sources: []
     sampled_competitors: []
     crowded_angles: []
     content_gap: ""
-  timing: "unknown" # now | soon | evergreen | late | unknown
+  timing: "unknown"
 
 research:
   source_registry: []
   claims: []
   calculations: []
+  uncertainty_nodes: []
+  depth_material: []
   cases: []
   controversy: []
   limitations: []
   originality_gate:
-    status: "unchecked" # pass | conditional | fail | unchecked
+    status: "unchecked"
     assets: []
     score: null
-    commodity_content_risk: "unknown" # low | medium | high | unknown
+    commodity_content_risk: "unknown"
     missing_original_material: []
 
 author:
   why_write: ""
+  pov_candidates: []
+  rejected_pov_ids: []
+  selected_pov_id: ""
   pov: []
   entry_point:
-    type: "" # detail | number | quote | job | product | scene | test | question | other
+    type: ""
     content: ""
     evidence_refs: []
+    decision_change: ""
   personal_material: []
-  material_to_ignore: []
-  narrative_choice: "" # single-thread | scene-led | evidence-led | argument-led | case-led | diary-led | compare-led
+  material_graveyard: []
+  selection_stats:
+    retained_units: 0
+    discarded_units: 0
+  uncertainty_usage: []
+  narrative_choice: ""
   voice_profile: ""
+  voice_calibration: "uncalibrated" # calibrated | partial | uncalibrated
   voice_traits: []
   preferred_moves: []
   banned_moves: []
-  first_person_level: "low" # none | low | medium | high
-  looseness: "natural" # tight | natural | conversational
+  first_person_level: "low"
+  looseness: "natural"
   humanity_test:
-    generic_ai_risk: "unknown" # low | medium | high | unknown
-    template_risk: "unknown" # low | medium | high | unknown
-    author_specificity: "unknown" # high | medium | low | unknown
+    generic_ai_risk: "unknown"
+    template_risk: "unknown"
+    author_specificity: "unknown"
     note: ""
 
 architecture:
@@ -101,38 +120,59 @@ writing:
   title_candidates: []
   selected_title: ""
   sections: []
-  body_status: "not_started" # not_started | draft | revised | final
+  body_status: "not_started"
   word_count: null
+  generation_trace:
+    strategy: "not_run" # not_run | isolated_segments | single_context_fallback
+    segment_count: 0
+    isolated_context: false
+    reorder_pass: false
+    note: ""
   anti_template_pass:
-    status: "not_run" # not_run | pass | rework
+    status: "not_run"
     detected_patterns: []
     edits_made: []
+  blind_review_packet:
+    ready: false
+    body_only: false
+    anonymous_reference_ids: []
   risk_notes: []
 
+blind_review:
+  status: "not_run" # not_run | pass | revise | pending_external | skipped_for_speed
+  evaluator_independence: "unknown" # fresh_session | different_model | same_context | unknown
+  ai_likeness: "unknown" # low | medium | high | unknown
+  voice_consistency: "unavailable" # high | medium | low | unavailable
+  findings: []
+  strongest_human_passages: []
+  reference_sample_ids: []
+  note: ""
+
 visual:
-  planning_status: "not_started" # not_started | planned | complete
-  execution_status: "not_started" # not_started | partial | complete | unavailable
+  planning_status: "not_started"
+  execution_status: "not_started"
   assets_ready: false
   cover: {}
   inline_images: []
   rights_risks: []
 
 qa:
-  status: "not_run" # not_run | A | B | C
+  status: "not_run"
   blocking_issues: []
   recommended_fixes: []
   voice_review:
-    author_presence: "unknown" # high | medium | low | unknown
-    template_risk: "unknown" # low | medium | high | unknown
-    voice_match: "unknown" # high | medium | low | unknown
+    author_presence: "unknown"
+    template_risk: "unknown"
+    voice_match: "unknown"
+    blind_review_status: "not_run"
 
 publishing:
-  plan_status: "not_started" # not_started | planned | ready
+  plan_status: "not_started"
   final_title: ""
   final_cover_asset_id: ""
   summary: ""
   publish_window: ""
-  urgency: "normal" # immediate | same_day | scheduled | evergreen | normal
+  urgency: "normal"
   channel: "wechat_official_account"
   distribution: []
   followups: []

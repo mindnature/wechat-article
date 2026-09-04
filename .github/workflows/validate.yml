@@ -1,11 +1,11 @@
-name: validate-v0.5
+name: validate-v0.6
 
 on:
   pull_request:
     paths:
       - 'schemas/**'
       - 'scripts/**'
-      - 'benchmarks/fixtures/**'
+      - 'benchmarks/**'
       - 'skills/**'
       - 'docs/**'
       - 'README.md'
@@ -21,8 +21,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
-      - name: Valid fixture must pass
+
+      - name: Valid v0.6 Standard fixture must pass
         run: python scripts/validate_state.py benchmarks/fixtures/valid-standard.yaml
+
       - name: Broken evidence fixture must fail
         shell: bash
         run: |
@@ -30,10 +32,65 @@ jobs:
             echo 'Broken evidence fixture unexpectedly passed'
             exit 1
           fi
-      - name: Generic AI voice fixture must fail Author Gate
+
+      - name: One-shot shallow POV must fail
         shell: bash
         run: |
-          if python scripts/validate_state.py benchmarks/fixtures/invalid-generic-ai-voice.yaml; then
-            echo 'Generic AI voice fixture unexpectedly passed'
+          python - <<'PY'
+          import yaml
+          p='benchmarks/fixtures/valid-standard.yaml'
+          d=yaml.safe_load(open(p,encoding='utf-8'))
+          d['author']['pov_candidates']=d['author']['pov_candidates'][:1]
+          d['author']['rejected_pov_ids']=[]
+          d['author']['selected_pov_id']='P01'
+          yaml.safe_dump(d,open('/tmp/shallow.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/shallow.yaml; then
+            echo 'Shallow one-POV fixture unexpectedly passed'
+            exit 1
+          fi
+
+      - name: Generic decision change must fail tension gate
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          p='benchmarks/fixtures/valid-standard.yaml'
+          d=yaml.safe_load(open(p,encoding='utf-8'))
+          d['topic']['tension_test']['decision_change']='多关注AI变化'
+          yaml.safe_dump(d,open('/tmp/generic-decision.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/generic-decision.yaml; then
+            echo 'Generic decision-change fixture unexpectedly passed'
+            exit 1
+          fi
+
+      - name: Same-context blind review must fail
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          p='benchmarks/fixtures/valid-standard.yaml'
+          d=yaml.safe_load(open(p,encoding='utf-8'))
+          d['blind_review']['evaluator_independence']='same_context'
+          yaml.safe_dump(d,open('/tmp/same-context.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/same-context.yaml; then
+            echo 'Same-context blind review unexpectedly passed'
+            exit 1
+          fi
+
+      - name: Fake uncertainty reference must fail
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          p='benchmarks/fixtures/valid-standard.yaml'
+          d=yaml.safe_load(open(p,encoding='utf-8'))
+          d['author']['uncertainty_usage'][0]['node_id']='U999'
+          yaml.safe_dump(d,open('/tmp/fake-uncertainty.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/fake-uncertainty.yaml; then
+            echo 'Fake uncertainty reference unexpectedly passed'
             exit 1
           fi

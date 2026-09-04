@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "article-state.schema.json",
-  "title": "WeChat ArticleState v0.5",
+  "title": "WeChat ArticleState v0.6",
   "type": "object",
-  "required": ["version", "article_id", "account", "production", "workflow", "signal", "topic", "research", "author", "architecture", "writing", "visual", "qa", "publishing", "publication", "performance", "learning"],
+  "required": ["version", "article_id", "account", "production", "workflow", "signal", "topic", "research", "author", "architecture", "writing", "blind_review", "visual", "qa", "publishing", "publication", "performance", "learning"],
   "properties": {
-    "version": {"const": "0.5"},
+    "version": {"const": "0.6"},
     "article_id": {"type": "string"},
     "account": {"type": "string"},
     "production": {
@@ -22,7 +22,7 @@
       "type": "object",
       "required": ["stage", "gate", "blocked_by", "return_to", "retry_count"],
       "properties": {
-        "stage": {"enum": ["signal", "topic", "research", "author", "architecture", "writing", "visual", "qa", "publishing", "published", "reviewed"]},
+        "stage": {"enum": ["signal", "topic", "research", "author", "architecture", "writing", "blind_review", "visual", "qa", "publishing", "published", "reviewed"]},
         "gate": {"enum": ["ready", "blocked", "rework", "manual_review"]},
         "blocked_by": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "return_to": {"type": "string"},
@@ -30,7 +30,23 @@
       }
     },
     "signal": {"type": "object"},
-    "topic": {"type": "object"},
+    "topic": {
+      "type": "object",
+      "properties": {
+        "tension_test": {
+          "type": "object",
+          "properties": {
+            "status": {"enum": ["pass", "weak", "fail", "unknown"]},
+            "contradiction": {"type": "string"},
+            "unresolved_question": {"type": "string"},
+            "decision_change": {"type": "string"},
+            "exclusive_material_path": {"type": "string"},
+            "strong_judgment_candidate": {"type": "string"},
+            "note": {"type": "string"}
+          }
+        }
+      }
+    },
     "research": {
       "type": "object",
       "required": ["source_registry", "claims", "calculations", "originality_gate"],
@@ -38,31 +54,38 @@
         "source_registry": {"type": "array", "items": {"$ref": "source.schema.json"}},
         "claims": {"type": "array", "items": {"$ref": "claim.schema.json"}},
         "calculations": {"type": "array", "items": {"$ref": "calculation.schema.json"}},
+        "uncertainty_nodes": {"type": "array"},
+        "depth_material": {"type": "array"},
         "originality_gate": {"type": "object"}
       }
     },
     "author": {
       "type": "object",
-      "required": ["why_write", "pov", "entry_point", "material_to_ignore", "narrative_choice", "voice_profile", "voice_traits", "banned_moves", "humanity_test"],
+      "required": ["why_write", "pov_candidates", "rejected_pov_ids", "selected_pov_id", "entry_point", "material_graveyard", "selection_stats", "narrative_choice", "voice_profile", "voice_calibration", "humanity_test"],
       "properties": {
         "why_write": {"type": "string"},
+        "pov_candidates": {"type": "array"},
+        "rejected_pov_ids": {"type": "array", "items": {"type": "string"}},
+        "selected_pov_id": {"type": "string"},
         "pov": {"type": "array", "items": {"type": "string"}},
-        "entry_point": {
+        "entry_point": {"type": "object"},
+        "personal_material": {"type": "array"},
+        "material_graveyard": {"type": "array"},
+        "selection_stats": {
           "type": "object",
-          "required": ["type", "content", "evidence_refs"],
+          "required": ["retained_units", "discarded_units"],
           "properties": {
-            "type": {"type": "string"},
-            "content": {"type": "string"},
-            "evidence_refs": {"type": "array", "items": {"type": "string"}}
+            "retained_units": {"type": "integer", "minimum": 0},
+            "discarded_units": {"type": "integer", "minimum": 0}
           }
         },
-        "personal_material": {"type": "array"},
-        "material_to_ignore": {"type": "array"},
+        "uncertainty_usage": {"type": "array"},
         "narrative_choice": {"enum": ["", "single-thread", "scene-led", "evidence-led", "argument-led", "case-led", "diary-led", "compare-led"]},
         "voice_profile": {"type": "string"},
-        "voice_traits": {"type": "array", "items": {"type": "string"}},
-        "preferred_moves": {"type": "array", "items": {"type": "string"}},
-        "banned_moves": {"type": "array", "items": {"type": "string"}},
+        "voice_calibration": {"enum": ["calibrated", "partial", "uncalibrated"]},
+        "voice_traits": {"type": "array"},
+        "preferred_moves": {"type": "array"},
+        "banned_moves": {"type": "array"},
         "first_person_level": {"enum": ["none", "low", "medium", "high"]},
         "looseness": {"enum": ["tight", "natural", "conversational"]},
         "humanity_test": {"type": "object"}
@@ -71,13 +94,14 @@
     "architecture": {"type": "object"},
     "writing": {
       "type": "object",
-      "required": ["title_candidates", "selected_title", "sections", "body_status", "anti_template_pass"],
+      "required": ["title_candidates", "selected_title", "sections", "body_status", "generation_trace", "anti_template_pass", "blind_review_packet"],
       "properties": {
         "title_candidates": {"type": "array"},
         "selected_title": {"type": "string"},
         "sections": {"type": "array", "items": {"$ref": "writing-section.schema.json"}},
         "body_status": {"enum": ["not_started", "draft", "revised", "final"]},
         "word_count": {"type": ["integer", "null"], "minimum": 0},
+        "generation_trace": {"type": "object"},
         "anti_template_pass": {
           "type": "object",
           "required": ["status", "detected_patterns", "edits_made"],
@@ -87,7 +111,22 @@
             "edits_made": {"type": "array"}
           }
         },
+        "blind_review_packet": {"type": "object"},
         "risk_notes": {"type": "array"}
+      }
+    },
+    "blind_review": {
+      "type": "object",
+      "required": ["status", "evaluator_independence", "ai_likeness", "voice_consistency", "findings"],
+      "properties": {
+        "status": {"enum": ["not_run", "pass", "revise", "pending_external", "skipped_for_speed"]},
+        "evaluator_independence": {"enum": ["fresh_session", "different_model", "same_context", "unknown"]},
+        "ai_likeness": {"enum": ["low", "medium", "high", "unknown"]},
+        "voice_consistency": {"enum": ["high", "medium", "low", "unavailable"]},
+        "findings": {"type": "array"},
+        "strongest_human_passages": {"type": "array"},
+        "reference_sample_ids": {"type": "array"},
+        "note": {"type": "string"}
       }
     },
     "visual": {

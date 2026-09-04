@@ -1,189 +1,117 @@
 ---
 name: viral-writer
-description: 基于证据、作者视角和叙事选择生成公众号正文；保持证据链，但主动消除结构模板、AI过渡句和通用说明文腔。
-version: "0.5"
+description: 基于证据与已筛选作者POV分段生成正文，再独立重排删减；禁止用同一连续生成节奏和伪犹豫制造“人味”。
+version: "0.6"
 reads: [topic, research, author, architecture, account, production, workflow]
 writes: [writing, workflow]
-resources: [../shared/account-profiles.md, ../shared/voice-profiles.md, ../../learning/proven-patterns.md, ../../learning/hypotheses.yaml, ../../docs/AUTHOR-VOICE.md, ../../docs/PRODUCTION-MODES.md]
+resources: [../shared/account-profiles.md, ../shared/voice-profiles.md, ../shared/voice-samples/manifest.yaml, ../../learning/proven-patterns.md, ../../learning/hypotheses.yaml, ../../docs/AUTHOR-VOICE.md, ../../docs/PRODUCTION-MODES.md]
 ---
 
 # ViralWriter｜公众号成稿
 
-遵循 v0.5 ArticleState、Schema 与 Skill Contract。
+遵循 v0.6 ArticleState、Schema 与 Skill Contract。
 
 ## 前置门
 ### Flash
-允许从 `workflow.stage: research, gate: ready` 进入；若跳过 AuthorLens，必须至少明确一个具体入口和一个作者判断。
+可从 research ready 进入，但必须有具体入口和一个明确判断。
 
 ### Standard / Deep
-必须：
-- `workflow.stage: architecture`
-- `workflow.gate: ready`
-- AuthorLens 已完成
-- Originality Gate 达标
+必须：architecture ready、AuthorLens 已完成、Originality Gate 达标、selected POV 可追溯。
 
 ## 核心原则
-1. 事实链严格，文字表面自由。
-2. 文章不需要展示后台的完整逻辑树。
-3. 作者必须做取舍，不能把ResearchPack全写进去。
-4. 不用“像人”的口头禅伪造作者性。
-5. 不强求每段都有信息点、结论或转折。
-6. 同一账号要有稳定声音，但不同文章允许不同结构。
+- 后台结构化，前台不展示流程。
+- 先分段生成，再重排；不要一次性从标题顺写到结尾。
+- 任何“犹豫/保留/我也不确定”必须绑定真实 Uxxx 节点。
+- Voice 样例权重高于形容词规则。
 
-## Step 1｜先读 AuthorLens，再读大纲
-优先级：
-`author.pov > author.entry_point > author.narrative_choice > architecture.structure`
+## Step 1｜建立 Segment Briefs
+从 architecture.structure 拆成 3–7 个局部写作包，每个只包含：
+- 本段任务
+- selected POV 的相关切面
+- 本段 Claim/Calc/Case
+- 本段允许使用的 uncertainty node
+- 本段 voice exemplar（若已校准）
+- 本段禁止动作
 
-如果大纲与作者视角冲突，退回 Architect，不要硬写。
+不得把“上一段已经怎么写”当作下一段必须延续的节奏模板。
 
-加载对应 `voice-profiles.md`，并把 `author.banned_moves` 当作本篇硬提醒。
-
-## Step 2｜证据链留在后台
-正文仍写入 `writing.sections`：
-
-```yaml
-- section_id: W01
-  source_section_id: A01
-  text: "..."
-  claim_ids: [C001]
-  calc_ids: []
-  case_ids: []
-  statement_types: [fact, opinion]
-```
-
-但成稿时不要按 Claim 顺序逐条解释，也不要把“Evidence→Conclusion”写成机械段落。
-
-新增事实必须回 ResearchPack。
-
-## Step 3｜开头不用统一钩子公式
-从 `author.entry_point` 自然进入。
-
-可以只做一件事：
-- 给一个具体细节
-- 给一句让人停下来的判断
-- 给一个数字
-- 给一个真实场景
-- 给一个作者自己在追的问题
-
-不要求前250–300字同时塞满背景、冲突、身份、收益。
-
-禁止高频模板：
-- 很多人的第一反应是
-- 但我觉得更值得关注的是
-- 真正值得看的不是…而是…
-- 这背后其实是
-- 这意味着什么
-- 对普通人来说
-
-这些词偶尔可以出现，但一旦承担结构功能，优先改成事实或直接判断。
-
-## Step 4｜段落节奏允许不均匀
-取消“正常段落2–4句”“每300–500字必须有一个新增信息”的硬规则。
-
-允许：
-- 一句短段
-- 一个较长的分析段
-- 一段只负责承接情绪或场景
-- 某节没有总结句
-
-要求只有一个：读起来像内容轻重自然决定节奏，而不是模型在平均分配篇幅。
-
-## Step 5｜作者存在感
-至少让读者感受到以下一种：
-- 一个明确判断
-- 一个真实第一手观察
-- 一个作者选择追问的问题
-- 一个具体取舍
-- 一个承认不确定的地方
-
-第一人称不是必须。`first_person_level=none/low` 时，可以不用“我”，通过取舍和判断体现作者。
-
-禁止把“我觉得”当作作者性的替代品。
-
-## Step 6｜少做总结，多做选择
-不要自动完成：
-- 全面背景
-- 所有影响
-- 三条建议
-- 六步方法
-- 未来展望
-
-只有在它们真正服务主线时才写。
-
-如果某一段只是“为了完整”，优先删除。
-
-## Step 7｜标题
-生成 8–15 个候选，不追求数量。
-
-标题可以来自：
-- 具体事件 + 一个怪点
-- 一个人群 + 一个现实冲突
-- 一个数字 + 一个判断
-- 一个新词 + 一个被忽略的问题
-
-所有硬事实仍需 title_safe，Scope 不得扩大。
-
-## Step 8｜Anti-Template Pass
-初稿完成后必须重读一次，重点不是同义词替换，而是结构重写。
-
-检查：
-1. 是否明显是 `What → Why → So what → How`？
-2. 是否每节长度过于接近？
-3. 是否每节都先概括、再解释、再总结？
-4. 是否连续出现抽象过渡句？
-5. 是否每篇都有反转？
-6. 是否结尾自动变成“普通人应该做X件事”？
-7. 去掉账号名后，是否任何AI号都能发布？
-
-发现问题时：
-- 优先删段
-- 合并段
-- 换入口
-- 把抽象句换成具体事实
-- 允许留下未完全封口的结论
+## Step 2｜分段生成
+优先真正隔离上下文：runner 若支持多调用，每个 segment 单独 invocation，只传局部 brief，不传已生成全文。
 
 记录：
-`writing.anti_template_pass.status`
-`detected_patterns`
-`edits_made`
+```yaml
+writing:
+  generation_trace:
+    strategy: isolated_segments | single_context_fallback
+    segment_count: 5
+    isolated_context: true
+    reorder_pass: false
+    note: ""
+```
 
-Standard/Deep 未 `pass` 不得进入视觉阶段。
+如果运行环境只能单次连续生成，必须标 `single_context_fallback`，不能假装已经完成隔离。
 
-## Step 9｜长度
-- Flash：通常1000–1500字
-- Standard：通常1200–2500字
-- Deep：2500–5000字或按价值延长
+## Step 3｜真实不确定性规则
+允许不确定表达的前提：该句绑定 `research.uncertainty_nodes` 中真实 Uxxx。
 
-长度是结果，不是必须填满的配额。
+禁止：
+- 为显得像真人而写“我也拿不准”
+- 证据已经明确却故意模糊
+- 用“可能/或许”掩盖没有研究
+
+## Step 4｜组装前先打散
+将各 segment 作为独立文本块审视，先不加小标题。
+
+检查：
+- 是否有两个段落其实在说同一件事
+- 是否存在“完整但不必要”的解释
+- 哪一段可以挪到更前/更后
+- 哪一段删掉后文章反而更有力
+
+## Step 5｜Reorder / Delete Pass
+必须单独进行一次重排删减，而不是在初稿上只改词。
+
+动作至少包含一种：
+- 删除一个完整段落/模块
+- 合并两个模块
+- 调换至少两段顺序
+- 去掉一个标准总结段
+
+如果完全不需要任何结构动作，要说明原因；默认视为风险信号。
+
+完成后：`generation_trace.reorder_pass=true`。
+
+## Step 6｜开头与结尾
+开头从具体入口自然进入，不统一钩子公式。
+
+结尾不负责“闭环所有问题”。可以停在一个判断、一个具体后果、一个尚未解决但有证据边界的问题。
+
+## Step 7｜标题
+8–15个候选即可。硬事实 title_safe；Scope 不得扩大。
+
+## Step 8｜Anti-Template Pass
+检查结构级痕迹：What→Why→So what→How、同长度小节、每节都反转、连续抽象过渡、标准三建议/六步法。
+
+优先删段/换序/合并，不做同义词美容。
+
+## Step 9｜Blind Review Handoff
+正文完成后不直接让同一上下文自评 Voice。
+
+生成一个最小 `blind_review.packet`：
+- 纯正文（去掉 ArticleState、POV、pipeline规则）
+- 账号名可匿名
+- 若有用户确认 Voice samples，仅给匿名正/反例，不说明哪篇是机器生成
+
+下一步进入独立 `BlindReview`。
 
 ## 输出
-### Human Summary
-- TOP3标题
-- 完整正文
-- 本篇作者视角如何体现
-- 证据映射摘要
-- Anti-Template Pass
-- 图片占位
-- 风险
+Human Summary：TOP3标题、完整正文、selected POV 如何落地、真实不确定性使用、generation trace、Anti-Template edits、Blind Review packet。
 
-### State Patch
-- `writing.title_candidates`
-- `writing.selected_title`
-- `writing.sections`
-- `writing.body_status`
-- `writing.word_count`
-- `writing.anti_template_pass`
-- `writing.risk_notes`
-- 通过：`workflow.stage: writing, gate: ready`
-
-新增未核验事实：`gate: rework, return_to: research`。
-作者视角写丢：`gate: rework, return_to: author`。
-模板结构过强：`gate: rework, return_to: writing`。
+State Patch：`writing.*`；完成后 `workflow.stage: writing, gate: ready`。
 
 ## 禁止
+- 一次连续顺写全文后假装“分段生成”
 - 编造采访/数据/亲测
-- 切断 Claim→正文证据链
-- 用第一人称伪造作者经历
-- 按后台结构逐项展示正文
-- 用禁词表代替真正的结构去AI
-- 结尾强行升华
+- 伪第一人称/伪犹豫
+- 按后台 Evidence 顺序逐条解释
+- 用禁词表代替结构重排

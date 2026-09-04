@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate WeChat ArticleState v0.5 structure, evidence lineage and author voice gates."""
+"""Validate WeChat ArticleState v0.6 structure, depth gates, evidence lineage and blind-review independence."""
 
 from __future__ import annotations
 
@@ -22,12 +22,15 @@ STAGE_ORDER = {
     "author": 3,
     "architecture": 4,
     "writing": 5,
-    "visual": 6,
-    "qa": 7,
-    "publishing": 8,
-    "published": 9,
-    "reviewed": 10,
+    "blind_review": 6,
+    "visual": 7,
+    "qa": 8,
+    "publishing": 9,
+    "published": 10,
+    "reviewed": 11,
 }
+
+GENERIC_DECISION_PHRASES = ("多关注", "多学习", "提高认知", "持续关注", "保持关注")
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -68,6 +71,7 @@ def validate_cross_refs(state: dict[str, Any]) -> list[str]:
     claims = research.get("claims", []) or []
     calculations = research.get("calculations", []) or []
     sources = research.get("source_registry", []) or []
+    uncertainty = research.get("uncertainty_nodes", []) or []
     writing = state.get("writing", {})
     sections = writing.get("sections", []) or []
     visual = state.get("visual", {})
@@ -78,6 +82,8 @@ def validate_cross_refs(state: dict[str, Any]) -> list[str]:
     claim_ids, e = unique_ids(claims, "claim_id", "claim_id")
     errors.extend(e)
     calc_ids, e = unique_ids(calculations, "calc_id", "calc_id")
+    errors.extend(e)
+    uncertainty_ids, e = unique_ids(uncertainty, "node_id", "uncertainty node_id")
     errors.extend(e)
     _, e = unique_ids(sections, "section_id", "writing section_id")
     errors.extend(e)
@@ -97,6 +103,11 @@ def validate_cross_refs(state: dict[str, Any]) -> list[str]:
         for kid in section.get("calc_ids", []) or []:
             if kid not in calc_ids:
                 errors.append(f"writing section {wid} references missing calculation {kid}")
+
+    for usage in state.get("author", {}).get("uncertainty_usage", []) or []:
+        uid = usage.get("node_id")
+        if uid and uid not in uncertainty_ids:
+            errors.append(f"author uncertainty_usage references missing uncertainty node {uid}")
 
     return errors
 
@@ -139,6 +150,28 @@ def validate_workflow(state: dict[str, Any]) -> list[str]:
     return errors
 
 
+def validate_tension(state: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    mode = state.get("production", {}).get("mode")
+    stage = state.get("workflow", {}).get("stage")
+    if mode == "flash" or stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["research"]:
+        return errors
+
+    tension = state.get("topic", {}).get("tension_test", {}) or {}
+    if tension.get("status") != "pass":
+        errors.append("standard/deep research requires topic.tension_test.status=pass")
+    if not (tension.get("contradiction", "").strip() or tension.get("unresolved_question", "").strip()):
+        errors.append("tension test requires contradiction or unresolved_question")
+    decision = tension.get("decision_change", "").strip()
+    if not decision:
+        errors.append("tension test requires concrete decision_change")
+    if any(p in decision for p in GENERIC_DECISION_PHRASES):
+        errors.append("tension decision_change is too generic")
+    if not (tension.get("exclusive_material_path", "").strip() or tension.get("strong_judgment_candidate", "").strip()):
+        errors.append("standard/deep tension requires exclusive material path or strong judgment candidate")
+    return errors
+
+
 def validate_originality(state: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     mode = state.get("production", {}).get("mode")
@@ -157,29 +190,49 @@ def validate_originality(state: dict[str, Any]) -> list[str]:
     return errors
 
 
-def validate_author_voice(state: dict[str, Any]) -> list[str]:
+def validate_author_depth(state: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     mode = state.get("production", {}).get("mode")
     stage = state.get("workflow", {}).get("stage")
-    if stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["architecture"]:
-        return errors
-    if mode == "flash":
+    if mode == "flash" or stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["architecture"]:
         return errors
 
     author = state.get("author", {})
-    if not author.get("why_write", "").strip():
-        errors.append("standard/deep architecture requires author.why_write")
-    if not author.get("pov"):
-        errors.append("standard/deep architecture requires at least one author.pov")
+    candidates = author.get("pov_candidates", []) or []
+    if len(candidates) != 3:
+        errors.append("standard/deep AuthorLens requires exactly 3 POV candidates")
+
+    pov_ids = {c.get("pov_id") for c in candidates if c.get("pov_id")}
+    selected = author.get("selected_pov_id")
+    if not selected or selected not in pov_ids:
+        errors.append("author.selected_pov_id must reference one POV candidate")
+    rejected = set(author.get("rejected_pov_ids", []) or [])
+    if len(rejected) < 2:
+        errors.append("AuthorLens must explicitly reject at least two POV candidates")
+
+    for c in candidates:
+        pid = c.get("pov_id", "?")
+        if not str(c.get("banality_self_critique", "")).strip():
+            errors.append(f"POV {pid} missing banality_self_critique")
+        if not str(c.get("decision_change", "")).strip():
+            errors.append(f"POV {pid} missing decision_change")
+
     entry = author.get("entry_point", {}) or {}
-    if not entry.get("content", "").strip():
-        errors.append("standard/deep architecture requires a concrete author.entry_point")
-    if not author.get("narrative_choice"):
-        errors.append("standard/deep architecture requires author.narrative_choice")
-    if not author.get("voice_profile", "").strip():
-        errors.append("standard/deep architecture requires author.voice_profile")
-    if not author.get("material_to_ignore"):
-        errors.append("author.material_to_ignore must record at least one deliberate omission")
+    decision = str(entry.get("decision_change", "")).strip()
+    if not decision:
+        errors.append("author.entry_point requires decision_change")
+    if any(p in decision for p in GENERIC_DECISION_PHRASES):
+        errors.append("author.entry_point decision_change is too generic")
+
+    stats = author.get("selection_stats", {}) or {}
+    retained = int(stats.get("retained_units", 0) or 0)
+    discarded = int(stats.get("discarded_units", 0) or 0)
+    if retained <= 0:
+        errors.append("author.selection_stats.retained_units must be > 0")
+    if discarded < retained:
+        errors.append("standard/deep material graveyard requires discarded_units >= retained_units")
+    if not author.get("material_graveyard"):
+        errors.append("author.material_graveyard must be non-empty")
 
     humanity = author.get("humanity_test", {}) or {}
     if humanity.get("generic_ai_risk") == "high":
@@ -188,6 +241,48 @@ def validate_author_voice(state: dict[str, Any]) -> list[str]:
         errors.append("author humanity test: template_risk is high")
     if humanity.get("author_specificity") == "low":
         errors.append("author humanity test: author_specificity is low")
+
+    return errors
+
+
+def validate_writing_generation(state: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    mode = state.get("production", {}).get("mode")
+    stage = state.get("workflow", {}).get("stage")
+    if mode == "flash" or stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["blind_review"]:
+        return errors
+
+    trace = state.get("writing", {}).get("generation_trace", {}) or {}
+    if trace.get("strategy") not in {"isolated_segments", "single_context_fallback"}:
+        errors.append("standard/deep writing requires segment generation strategy")
+    if int(trace.get("segment_count", 0) or 0) < 2:
+        errors.append("standard/deep writing requires at least 2 generated segments")
+    if trace.get("reorder_pass") is not True:
+        errors.append("standard/deep writing requires reorder/delete pass")
+
+    packet = state.get("writing", {}).get("blind_review_packet", {}) or {}
+    if packet.get("ready") is not True or packet.get("body_only") is not True:
+        errors.append("blind review packet must be ready and body_only")
+    return errors
+
+
+def validate_blind_review(state: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    mode = state.get("production", {}).get("mode")
+    stage = state.get("workflow", {}).get("stage")
+    if mode == "flash" or stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["visual"]:
+        return errors
+
+    review = state.get("blind_review", {}) or {}
+    if review.get("status") != "pass":
+        errors.append("standard/deep visual stage requires blind_review.status=pass")
+    if review.get("evaluator_independence") not in {"fresh_session", "different_model"}:
+        errors.append("blind review must use fresh_session or different_model")
+    if review.get("ai_likeness") == "high":
+        errors.append("blind review ai_likeness=high cannot pass")
+    high_findings = [f for f in review.get("findings", []) or [] if f.get("severity") == "high"]
+    if high_findings:
+        errors.append("blind review has unresolved high-severity findings")
     return errors
 
 
@@ -207,8 +302,11 @@ def validate(path: Path) -> list[str]:
     errors.extend(validate_schema(state))
     errors.extend(validate_cross_refs(state))
     errors.extend(validate_workflow(state))
+    errors.extend(validate_tension(state))
     errors.extend(validate_originality(state))
-    errors.extend(validate_author_voice(state))
+    errors.extend(validate_author_depth(state))
+    errors.extend(validate_writing_generation(state))
+    errors.extend(validate_blind_review(state))
     errors.extend(validate_calculations(state))
     return errors
 

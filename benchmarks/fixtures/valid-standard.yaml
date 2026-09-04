@@ -1,4 +1,4 @@
-version: "0.5"
+version: "0.6"
 article_id: "fixture-valid-standard"
 account: "思然修远"
 created_at: "2026-09-04T00:00:00+08:00"
@@ -20,25 +20,24 @@ signal:
   freshness: stable
   scope: national
   source_ids: [S001]
-  duplicate_check:
-    status: clear
-    related_article_ids: []
-    note: ""
+  duplicate_check: {status: clear, related_article_ids: [], note: ""}
 topic:
   target_reader: "30+读者"
   core_angle: "示例角度"
-  core_conflict: "示例冲突"
-  reader_value: "帮助做判断"
+  core_conflict: "眼前现金流与长期成本冲突"
+  reader_value: "改变是否延长期限的决定"
+  tension_test:
+    status: pass
+    contradiction: "月供下降但总成本上升"
+    unresolved_question: "现金流改善是否值得长期成本"
+    decision_change: "决定是否把贷款期限拉长"
+    exclusive_material_path: "自主计算不同期限成本"
+    strong_judgment_candidate: "低月供不等于更便宜"
+    note: ""
   market_score: {demand: 3, urgency: 2, conflict: 3, information_gap: 4}
   account_fit_score: {identity_match: 5, historical_fit: null, actionability: 4}
   evidence_confidence: high
-  competition:
-    status: partial
-    level: medium
-    scanned_sources: []
-    sampled_competitors: []
-    crowded_angles: []
-    content_gap: "示例"
+  competition: {status: partial, level: medium, scanned_sources: [], sampled_competitors: [], crowded_angles: [], content_gap: "示例"}
   timing: now
 research:
   source_registry:
@@ -69,6 +68,20 @@ research:
       result: 2
       sensitivity: "无"
       verification: reproduced
+  uncertainty_nodes:
+    - node_id: U001
+      type: calculation_assumption
+      description: "结果依赖假设A"
+      evidence_refs: [K001]
+      what_is_known: "公式与输入已知"
+      what_is_unknown: "真实个体假设可能不同"
+      allowed_voice_effect: hedge
+  depth_material:
+    - material_id: D001
+      type: calculation
+      exclusive: true
+      refs: [K001]
+      note: "自主计算"
   cases: []
   controversy: []
   limitations: []
@@ -84,42 +97,84 @@ research:
     commodity_content_risk: low
     missing_original_material: []
 author:
-  why_write: "这个示例选择从一个具体数字切入，而不是完整复述背景。"
-  pov:
-    - "作者只想说明一个可验证判断。"
+  why_write: "从一个具体数字切入，不完整复述背景。"
+  pov_candidates:
+    - pov_id: P01
+      thesis: "低月供不等于更低成本"
+      evidence_refs: [K001]
+      tension: "现金流与总成本"
+      decision_change: "决定是否拉长期限"
+      banality_self_critique: "仍可能只是常规算账，但有自主计算支撑"
+      replaceability: medium
+      risk: ""
+    - pov_id: P02
+      thesis: "年龄门槛比期限本身更值得关注"
+      evidence_refs: [C001]
+      tension: "选择权随年龄收缩"
+      decision_change: "决定是否提前规划贷款"
+      banality_self_critique: "容易被写成普通政策提醒"
+      replaceability: high
+      risk: ""
+    - pov_id: P03
+      thesis: "期限本质上是在购买现金流空间"
+      evidence_refs: [K001]
+      tension: "用长期利息购买短期现金流"
+      decision_change: "比较现金流价值与利息成本"
+      banality_self_critique: "如果没有计算会变成抽象财务观点"
+      replaceability: low
+      risk: ""
+  rejected_pov_ids: [P01, P02]
+  selected_pov_id: P03
+  pov: ["期限是在购买现金流空间"]
   entry_point:
     type: number
     content: "示例计算结果为2"
     evidence_refs: [K001]
+    decision_change: "比较现金流价值与利息成本后再决定期限"
   personal_material:
     - type: calculation
       ref: K001
-  material_to_ignore:
-    - "不服务核心判断的完整背景"
+  material_graveyard:
+    - item_id: G001
+      refs: [C001]
+      summary: "完整政策背景"
+      why_excluded: "不服务现金流主线"
+      weight: 2
+    - item_id: G002
+      refs: [S001]
+      summary: "机构历史背景"
+      why_excluded: "只是完整性信息"
+      weight: 2
+  selection_stats: {retained_units: 3, discarded_units: 4}
+  uncertainty_usage:
+    - node_id: U001
+      intended_expression: hedge
   narrative_choice: evidence-led
   voice_profile: "思然修远"
-  voice_traits: ["克制", "具体", "现实"]
-  preferred_moves: ["从数字进入"]
-  banned_moves: ["机械三条建议"]
+  voice_calibration: uncalibrated
+  voice_traits: []
+  preferred_moves: []
+  banned_moves: []
   first_person_level: low
   looseness: natural
   humanity_test:
     generic_ai_risk: low
     template_risk: low
     author_specificity: high
-    note: "有明确取舍与入口"
+    note: "三选一且有材料取舍"
 architecture:
-  core_thesis: "示例核心命题"
+  core_thesis: "期限是在购买现金流空间"
   article_type: "决策算账型"
-  reader_task: "形成判断"
+  reader_task: "判断现金流价值是否值得额外成本"
   narrative_choice: evidence-led
   structure:
     - section_id: A01
-      role: "从数字进入并形成判断"
-      key_message: "已核验事实"
+      role: "从数字进入"
+      key_message: "示例计算"
       claim_ids: [C001]
       calc_ids: [K001]
       case_ids: []
+      uncertainty_ids: [U001]
       statement_types: [fact, calculation]
       author_function: evidence
       visual_node: "V001"
@@ -129,7 +184,7 @@ writing:
   title_candidates:
     - text: "示例标题"
       claim_ids: [C001]
-      calc_ids: []
+      calc_ids: [K001]
       scope_note: "national"
       risk: low
   selected_title: "示例标题"
@@ -141,21 +196,44 @@ writing:
       calc_ids: [K001]
       case_ids: []
       statement_types: [fact, calculation]
+    - section_id: W02
+      source_section_id: A01
+      text: "这笔差额应按个人现金流价值判断。"
+      claim_ids: []
+      calc_ids: [K001]
+      case_ids: []
+      statement_types: [opinion, calculation]
   body_status: final
   word_count: 1800
+  generation_trace:
+    strategy: isolated_segments
+    segment_count: 2
+    isolated_context: true
+    reorder_pass: true
+    note: "两个局部brief分开生成后重排"
   anti_template_pass:
     status: pass
     detected_patterns: []
-    edits_made: ["删除不必要背景"]
+    edits_made: ["删除不必要背景", "调换两段顺序"]
+  blind_review_packet:
+    ready: true
+    body_only: true
+    anonymous_reference_ids: []
   risk_notes: []
+blind_review:
+  status: pass
+  evaluator_independence: fresh_session
+  ai_likeness: low
+  voice_consistency: unavailable
+  findings: []
+  strongest_human_passages: ["这笔差额应按个人现金流价值判断。"]
+  reference_sample_ids: []
+  note: "无已校准Voice样例，做纯正文盲审"
 visual:
   planning_status: complete
   execution_status: complete
   assets_ready: true
-  cover:
-    asset_id: V000
-    status: ready
-    file_ref: "cover.png"
+  cover: {asset_id: V000, status: ready, file_ref: "cover.png"}
   inline_images:
     - asset_id: V001
       function: explain
@@ -175,7 +253,8 @@ qa:
   voice_review:
     author_presence: high
     template_risk: low
-    voice_match: high
+    voice_match: unknown
+    blind_review_status: pass
 publishing:
   plan_status: not_started
   final_title: ""
@@ -187,24 +266,7 @@ publishing:
   distribution: []
   followups: []
   analytics_schedule: ["1h", "24h", "72h"]
-publication:
-  published_at: ""
-  channel: wechat_official_account
-  url: ""
-performance:
-  one_hour: {}
-  twenty_four_hour: {}
-  seventy_two_hour: {}
-  baseline_snapshot: {}
-experiment:
-  experiment_id: ""
-  hypothesis: ""
-  variable: ""
-  variant: ""
-  comparator: ""
-  primary_metric: ""
-  preregistered: false
-learning:
-  observations: []
-  hypotheses: []
-  promoted_rules: []
+publication: {published_at: "", channel: wechat_official_account, url: ""}
+performance: {one_hour: {}, twenty_four_hour: {}, seventy_two_hour: {}, baseline_snapshot: {}}
+experiment: {experiment_id: "", hypothesis: "", variable: "", variant: "", comparator: "", primary_metric: "", preregistered: false}
+learning: {observations: [], hypotheses: [], promoted_rules: []}

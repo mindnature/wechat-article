@@ -1,174 +1,85 @@
-# Skill Contract｜v0.5
+# Skill Contract｜v0.6
 
-所有子 Skill 必须遵循统一状态、Schema、证据链与作者声音契约。
+所有子 Skill 遵循统一状态、证据链、深度生成和独立盲审契约。
 
-## 1. Front Matter
-
-```yaml
----
-name: <kebab-case>
-description: <一句话职责>
-version: "0.5"
-reads: [<ArticleState fields>]
-writes: [<ArticleState fields>]
-resources: [<optional external files>]
----
-```
-
-- `reads` 只声明 ArticleState 字段。
-- `writes` 只声明本 Skill 可修改字段。
-- `resources` 声明 Ledger、learning、账号画像、Voice Profile 等资源。
-
-## 2. 共享状态与机器验证
-
-默认状态模板：`../schemas/article-state.yaml`。
-机器 Schema：`../schemas/article-state.schema.json`。
-
-结构化输出必须满足 JSON Schema；若运行环境无法自动校验，也要进行等价字段检查。
-
-## 3. Stage 与 Gate 分离
-
+## 1. Stage / Gate
 `workflow.stage`：
-`signal | topic | research | author | architecture | writing | visual | qa | publishing | published | reviewed`
+`signal | topic | research | author | architecture | writing | blind_review | visual | qa | publishing | published | reviewed`
 
-`workflow.gate`：
-`ready | blocked | rework | manual_review`
+`workflow.gate`：`ready | blocked | rework | manual_review`。
 
-被阻断时同时记录 `blocked_by`、`return_to`、`retry_count`。
+## 2. 事实层
+保持 v0.5 的 Evidence / Calculation / Scope 规则不变。新增 `research.uncertainty_nodes`：只有真实证据不确定性才能驱动犹豫语气。
 
-## 4. 输出三层
+## 3. Tension Gate
+Standard / Deep 在 Research 前必须通过 `topic.tension_test`：
+- 具体 contradiction/unresolved question；
+- 具体 decision_change；
+- exclusive material path 或 strong judgment candidate 至少一个成立。
 
-每个 Skill 输出：
-1. `Human Summary`
-2. `State Patch`
-3. 如涉及持久化：`Persistence Patch`
+只有公开资料+第二显然观点，不应包装成深度稿。
 
-无法写入资源时标记 `not_persisted`，不能假装已学习/去重。
+## 4. Author Competition Gate
+AuthorLens 必须：
+- 生成恰好3个真正不同的 POV candidates；
+- 每个写 banality_self_critique；
+- 淘汰至少2个；
+- selected POV 有具体 decision_change；
+- Standard/Deep 记录 Material Graveyard，`discarded_units >= retained_units`。
 
-## 5. 事实层保持严格
+## 5. Real Uncertainty
+第一人称犹豫/保留判断只能引用 Uxxx。不许凭空生成“我也不确定”来模拟人味。
 
-事实类型：`fact | calculation | inference | opinion | unknown`。
+## 6. Voice Calibration
+`voice-profiles.md` 只是低权重边界。
 
-Scope：`global | national | province | city | institution | company | single_case | unknown`。
+真正 Voice 依据 `voice-samples/manifest.yaml` 中用户确认的正/反例。历史稿未被用户明确标注，不得自动当正例。
 
-Scope 扩大视为事实错误。
+## 7. Segmented Generation
+Standard / Deep Writer 先建立局部 briefs，再优先分 invocation 生成 segments。
 
-## 6. Evidence / Calculation Ledger
+必须记录：
+- strategy: isolated_segments | single_context_fallback
+- segment_count
+- isolated_context
+- reorder_pass
 
-关键事实进入 `research.claims`；自行计算进入 `research.calculations`。
+初稿后必须单独执行重排/删减 pass，不能只改词。
 
-正文继续保持：
-`Source → Claim/Calc → Architecture → Writing`。
+## 8. Blind Review
+Standard / Deep 在 VisualEditor 前必须执行独立 BlindReview。
 
-证据链必须可审计，但证据ID和后台结构不得泄漏成前台文风。
+有效独立性：`fresh_session | different_model`。
 
-## 7. Originality Gate
+`same_context` 不算通过；当前环境不能提供独立上下文时，必须 `pending_external + manual_review`，不能自己给自己盖章。
 
-按 `../docs/ORIGINALITY-RUBRIC.md`：
-- Standard：≥1A 或 ≥2B
-- Deep：≥1A+1B
-- Flash：可 conditional
+Blind reviewer 不得看到：ResearchPack、AuthorLens、Architecture、Anti-Template 规则或 Writer 自评。
 
-Originality 只回答“有没有信息增量”，不等于 Author Voice。
+## 9. Blind Packet
+只包含纯正文，以及可选的用户确认 Voice 样例匿名混排。Reviewer 必须指出具体AI句/段，而不是只打分。
 
-## 8. Author Gate｜v0.5新增
+## 10. PublisherQA
+QA 继续负责事实、Scope、计算、版权、视觉；文风主证据改为独立 BlindReview，不再依赖同一上下文的 Voice Match 自评。
 
-Standard / Deep 在 ResearchPack 后必须经过 AuthorLens。
+Standard/Deep QA=A 必须 blind_review pass。
 
-最少记录：
-- `author.why_write`
-- `author.pov`
-- `author.entry_point`
-- `author.material_to_ignore`
-- `author.narrative_choice`
-- `author.voice_profile`
-- `author.humanity_test`
+## 11. Originality / Visual / Publishing / Learning
+沿用 v0.5：Originality、Visual Ready、PublishingPlan、真实后台数据学习门不降低。
 
-原则：
-- 必须有明确取舍，不允许把 ResearchPack 全写进正文。
-- 第一人称不是必须；作者性可以来自判断、入口、选择与不确定性。
-- 禁止伪造经历来制造“人味”。
+## 12. 失败处理
+- 张力浅：回 topic
+- 材料不足：回 research
+- POV 平庸/取舍不足：回 author
+- 连续生成节奏/AI痕迹：回 writing
+- 无独立评审：manual_review / blind_review
+- 视觉未完成：回 visual
 
-Flash 可跳过完整 AuthorLens，但必须至少有一个具体入口和一个明确判断。
-
-## 9. 后台结构化，前台自由
-
-ArticleArchitect / ViralWriter 不得把系统流程直接投射成文章模板。
-
-不再强制：
-- 固定情绪曲线
-- 前300字同时完成四个钩子任务
-- 2–4句固定段落
-- 每300–500字强制新增信息
-- What→Why→So what→How
-- 结尾行动清单
-
-详见 `../docs/AUTHOR-VOICE.md`。
-
-## 10. Narrative Choice
-
-每篇只选一个主推进方式：
-`single-thread | scene-led | evidence-led | argument-led | case-led | diary-led | compare-led`。
-
-结构服务作者 POV，而不是为“完整”服务。
-
-## 11. Anti-Template Pass
-
-Standard / Deep 完稿后必须执行 `writing.anti_template_pass`。
-
-检查重点：
-- 结构是否过于可预测
-- 每节是否长度/功能过于均匀
-- 抽象过渡句是否过密
-- 是否机械反转
-- 是否自动生成方法论/建议清单
-- 去掉账号名后是否任何AI号都能发布
-
-未 pass 不得进入最终 QA A级。
-
-## 12. Voice Profile
-
-账号定位见 `../skills/shared/account-profiles.md`。
-具体声音见 `../skills/shared/voice-profiles.md`。
-
-Account Profile 决定写什么；Voice Profile 决定怎么像这个账号的人在说。
-
-## 13. Visual Ready Gate
-
-视觉规划和执行分开：`planning_status`、`execution_status`、`assets_ready`。
-
-资产未完成，PublisherQA 不得给最终 A。
-
-## 14. Publishing Gate
-
-QA A 后进入 PublishingPlan，确定最终标题、封面、摘要、发布窗口、分发与数据计划。
-
-## 15. Production Mode
-
-按 `../docs/PRODUCTION-MODES.md`：`flash | standard | deep`。
-
-模式只改变研究/结构深度，不降低事实、Scope、版权等硬门。
-
-## 16. Competition / Score / Experiment
-
-- Competition 只能对实际扫描样本下结论。
-- 0–5评分必须使用 TopicHunter 明确锚点。
-- 增长实验尽量发布前登记 `experiment.*`，避免事后归因。
-
-## 17. 失败处理
-
-缺数据：`unknown/N/A`。
-关键事实失证：退回 research。
-作者视角空泛：退回 author。
-模板风险高：退回 writing/author。
-视觉未执行：退回 visual。
-
-## 18. 回归测试
-
-修改 Skill 后至少运行 `../benchmarks/cases.yaml` 对应案例。
-
-v0.5 新增不可退化项：
-- AuthorLens 不能被跳过（Standard/Deep）
-- Author POV/具体入口不得为空
-- Anti-Template Pass 必须真实运行
-- QA A 时 Author Presence 不能 low、Template Risk 不能 high
+## 13. 回归测试
+不可退化项新增：
+- Standard/Deep 必须有 Tension Test
+- AuthorLens 必须3选1而非单次生成
+- Graveyard 必须形成可审计取舍
+- 假犹豫不能没有 Uxxx
+- Writer 必须 segment + reorder
+- same-context BlindReview 必须失败
+- 未确认历史文章不能进入 Voice Gold Samples
