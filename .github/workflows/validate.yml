@@ -1,4 +1,4 @@
-name: validate-v0.7
+name: validate-v0.7.1
 
 on:
   pull_request:
@@ -22,8 +22,8 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
 
-      - name: Valid v0.7 Standard fixture must pass
-        run: python scripts/validate_state.py benchmarks/fixtures/valid-standard.yaml
+      - name: Valid v0.7.1 Standard fixture must pass all gates
+        run: python scripts/validate_article.py benchmarks/fixtures/valid-standard.yaml
 
       - name: Broken evidence reference must fail
         shell: bash
@@ -149,3 +149,34 @@ jobs:
           yaml.safe_dump(d,open('/tmp/fake-uncertainty.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
           PY
           if python scripts/validate_state.py /tmp/fake-uncertainty.yaml; then exit 1; fi
+
+      - name: Noun-stack micro paragraphs must fail readability
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          d['writing']['sections'][1]['text']='算力。\n数据。\n场景。\n融资。'
+          yaml.safe_dump(d,open('/tmp/noun-stack.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_readability.py /tmp/noun-stack.yaml; then
+            echo 'Noun-stack fragmentation unexpectedly passed'
+            exit 1
+          fi
+
+      - name: Three consecutive one-sentence paragraphs must fail readability
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          d['writing']['sections'][2]['text']='这一类工作可以先交给Agent处理。\n第二步仍然只是普通执行动作。\n最后再由老师统一检查结果。'
+          yaml.safe_dump(d,open('/tmp/single-stack.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_readability.py /tmp/single-stack.yaml; then
+            echo 'Consecutive one-sentence paragraphs unexpectedly passed'
+            exit 1
+          fi
+
+      - name: Numbered framework with natural paragraphs must pass readability
+        run: python scripts/validate_readability.py benchmarks/fixtures/valid-standard.yaml
