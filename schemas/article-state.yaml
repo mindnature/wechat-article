@@ -42,13 +42,13 @@ topic:
     strong_judgment_candidate: ""
     note: ""
   reader_promise:
-    promise_type: "other" # which | how | why | compare | decide | explain | list | other
+    promise_type: "other"
     promise: ""
     provisional_answer: ""
-    delivery_shape: "numbered_framework" # numbered_framework | decision_tree | comparison | checklist | narrative | hybrid
+    delivery_shape: "numbered_framework"
     delivery_preview: []
-    status: "unknown" # pass | weak | fail | unknown
-  delivery_potential: "unknown" # high | medium | low | unknown
+    status: "unknown"
+  delivery_potential: "unknown"
   market_score:
     demand: null
     urgency: null
@@ -125,7 +125,7 @@ architecture:
     promise_type: "other"
     promise: ""
     core_answer: ""
-    answer_shape: "numbered_framework" # numbered_framework | decision_tree | comparison | checklist | narrative | hybrid
+    answer_shape: "numbered_framework"
     expected_units: 0
     delivery_units: []
   thesis_prominence:
@@ -147,19 +147,20 @@ writing:
   body_status: "not_started"
   word_count: null
   generation_trace:
-    strategy: "not_run" # not_run | isolated_segments | single_context_fallback
+    strategy: "not_run"
     segment_count: 0
     isolated_context: false
     reorder_pass: false
     note: ""
   clarity_pass:
-    status: "not_run" # not_run | pass | rework
+    status: "not_run"
+    first_screen_excerpt: ""
     thesis_in_first_screen: false
-    promise_delivery_status: "not_run" # not_run | pass | rework
+    promise_delivery_status: "not_run"
     numbered_framework_used: false
     missing_delivery_units: []
     evidence_overload_first_screen: false
-    concrete_task_coverage: "not_run" # not_run | pass | rework
+    concrete_task_coverage: "not_run"
     edits_made: []
   anti_template_pass:
     status: "not_run"
@@ -194,7 +195,7 @@ qa:
   blocking_issues: []
   recommended_fixes: []
   clarity_review:
-    thesis_prominence: "unknown" # pass | fail | unknown
+    thesis_prominence: "unknown"
     first_screen: "unknown"
     promise_delivery: "unknown"
     macro_structure: "unknown"
