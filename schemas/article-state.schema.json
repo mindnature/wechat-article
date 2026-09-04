@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/mindnature/wechat-article/schemas/article-state.schema.json",
+  "$id": "article-state.schema.json",
   "title": "WeChat ArticleState v0.4",
   "type": "object",
   "required": ["version", "article_id", "account", "production", "workflow", "signal", "topic", "research", "architecture", "writing", "visual", "qa", "publishing", "publication", "performance", "learning"],
