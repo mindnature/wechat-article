@@ -1,4 +1,4 @@
-version: "0.6"
+version: "0.7"
 article_id: ""
 account: ""
 created_at: ""
@@ -34,13 +34,21 @@ topic:
   core_conflict: ""
   reader_value: ""
   tension_test:
-    status: "unknown" # pass | weak | fail | unknown
+    status: "unknown"
     contradiction: ""
     unresolved_question: ""
     decision_change: ""
     exclusive_material_path: ""
     strong_judgment_candidate: ""
     note: ""
+  reader_promise:
+    promise_type: "other" # which | how | why | compare | decide | explain | list | other
+    promise: ""
+    provisional_answer: ""
+    delivery_shape: "numbered_framework" # numbered_framework | decision_tree | comparison | checklist | narrative | hybrid
+    delivery_preview: []
+    status: "unknown" # pass | weak | fail | unknown
+  delivery_potential: "unknown" # high | medium | low | unknown
   market_score:
     demand: null
     urgency: null
@@ -82,6 +90,7 @@ author:
   rejected_pov_ids: []
   selected_pov_id: ""
   pov: []
+  provisional_core_answer: ""
   entry_point:
     type: ""
     content: ""
@@ -95,7 +104,7 @@ author:
   uncertainty_usage: []
   narrative_choice: ""
   voice_profile: ""
-  voice_calibration: "uncalibrated" # calibrated | partial | uncalibrated
+  voice_calibration: "uncalibrated"
   voice_traits: []
   preferred_moves: []
   banned_moves: []
@@ -112,6 +121,21 @@ architecture:
   article_type: ""
   reader_task: ""
   narrative_choice: ""
+  reader_contract:
+    promise_type: "other"
+    promise: ""
+    core_answer: ""
+    answer_shape: "numbered_framework" # numbered_framework | decision_tree | comparison | checklist | narrative | hybrid
+    expected_units: 0
+    delivery_units: []
+  thesis_prominence:
+    required_in_first_screen: true
+    max_chars: 300
+    delayed_reason: ""
+  first_screen_plan:
+    core_answer: ""
+    delivery_preview: ""
+    credibility_anchor: ""
   structure: []
   optional_emotion_notes: []
   visual_nodes: []
@@ -128,6 +152,15 @@ writing:
     isolated_context: false
     reorder_pass: false
     note: ""
+  clarity_pass:
+    status: "not_run" # not_run | pass | rework
+    thesis_in_first_screen: false
+    promise_delivery_status: "not_run" # not_run | pass | rework
+    numbered_framework_used: false
+    missing_delivery_units: []
+    evidence_overload_first_screen: false
+    concrete_task_coverage: "not_run" # not_run | pass | rework
+    edits_made: []
   anti_template_pass:
     status: "not_run"
     detected_patterns: []
@@ -139,10 +172,10 @@ writing:
   risk_notes: []
 
 blind_review:
-  status: "not_run" # not_run | pass | revise | pending_external | skipped_for_speed
-  evaluator_independence: "unknown" # fresh_session | different_model | same_context | unknown
-  ai_likeness: "unknown" # low | medium | high | unknown
-  voice_consistency: "unavailable" # high | medium | low | unavailable
+  status: "not_run"
+  evaluator_independence: "unknown"
+  ai_likeness: "unknown"
+  voice_consistency: "unavailable"
   findings: []
   strongest_human_passages: []
   reference_sample_ids: []
@@ -160,6 +193,12 @@ qa:
   status: "not_run"
   blocking_issues: []
   recommended_fixes: []
+  clarity_review:
+    thesis_prominence: "unknown" # pass | fail | unknown
+    first_screen: "unknown"
+    promise_delivery: "unknown"
+    macro_structure: "unknown"
+    concrete_delivery: "unknown"
   voice_review:
     author_presence: "unknown"
     template_risk: "unknown"
