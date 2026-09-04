@@ -1,0 +1,32 @@
+version: "0.7.1"
+cases:
+  - id: B036
+    name: 名词逐行拆分
+    input: 正文把“算力、数据、场景、融资”分别写成四个独立短段
+    expected:
+      readability_must_fail: true
+      reason: micro_paragraph_stack
+      repair: merge_into_natural_paragraph
+
+  - id: B037
+    name: 连续一句一段
+    input: 一个正常论证被拆成连续3个以上单句正文段，每段只承担一句普通说明
+    expected:
+      readability_must_fail: true
+      max_consecutive_single_sentence: 2
+      repair: merge_related_sentences
+
+  - id: B038
+    name: 少量关键单句强调
+    input: 全文以自然段为主，仅在核心结论处使用1个单句强调段
+    expected:
+      readability_should_pass: true
+      single_sentence_emphasis_allowed: true
+
+  - id: B039
+    name: 编号清晰但正文自然
+    input: 使用01/02/03/04信息型小标题，每个小标题下用2至4句自然段完成说明
+    expected:
+      readability_should_pass: true
+      numbered_framework_must_not_be_penalized: true
+      natural_paragraphs_preferred: true
