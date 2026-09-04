@@ -1,69 +1,69 @@
-# Skill Contract｜v0.3
+# Skill Contract｜v0.4
 
-所有子 Skill 必须遵守同一份状态契约，避免自由文本接力造成上下文漂移。
+所有子 Skill 必须遵循统一状态、Schema 和资源契约，避免自然语言接力造成漂移。
 
-## 1. 统一 Front Matter
-
-每个 `SKILL.md` 必须以以下字段开头：
+## 1. Front Matter
 
 ```yaml
 ---
 name: <kebab-case>
 description: <一句话职责>
-version: "0.3"
+version: "0.4"
 reads: [<ArticleState fields>]
 writes: [<ArticleState fields>]
 resources: [<optional external files>]
 ---
 ```
 
-说明：
-- `reads` 只声明从 `ArticleState` 读取的字段；
-- `writes` 只声明向 `ArticleState` 写入的字段；
-- `resources` 声明 Ledger、learning、账号画像等外部持久化资源；没有则可省略。
+- `reads` 只声明 ArticleState 字段。
+- `writes` 只声明本 Skill 可修改字段。
+- `resources` 声明 Ledger、learning、账号画像等持久化资源。
 
-## 2. 单一共享状态
+## 2. 共享状态与机器验证
 
-默认状态模板：`schemas/article-state.yaml`。
+默认状态模板：`../schemas/article-state.yaml`。
+机器 Schema：`../schemas/article-state.schema.json`。
 
-子 Skill 不重新发明字段名；只读取自己需要的字段，并只修改声明的 `writes` 字段。
+结构化输出必须满足 JSON Schema；若运行环境无法自动校验，也要进行等价字段检查。
 
-如没有结构化状态文件，也要按同一字段名输出 `State Patch`，供下一环节合并。
+## 3. Stage 与 Gate 分离
 
-## 3. 输出必须分两层
+禁止用一个 `status` 同时表达流程位置和失败状态。
+
+`workflow.stage`：
+`signal | topic | research | architecture | writing | visual | qa | publishing | published | reviewed`
+
+`workflow.gate`：
+`ready | blocked | rework | manual_review`
+
+被阻断时同时记录：
+- `blocked_by`
+- `return_to`
+- `retry_count`
+
+## 4. 输出三层
 
 每个 Skill 输出：
+1. `Human Summary`
+2. `State Patch`
+3. 如涉及持久化：`Persistence Patch`
 
-1. `Human Summary`：给作者快速阅读；
-2. `State Patch`：仅包含本 Skill 新增或修改的 ArticleState 字段。
+无法写入资源时标记 `not_persisted`，不能假装已学习/去重。
 
-涉及外部持久化资源时，额外输出：
+## 5. 事实类型
+- `fact`
+- `calculation`
+- `inference`
+- `opinion`
+- `unknown`
 
-3. `Persistence Patch`：明确要写入哪个资源、什么字段；如果运行环境没有写权限，必须标记 `not_persisted`。
-
-禁止让下一 Skill 依靠解析整段散文来猜上一步结论。
-
-## 4. 事实与判断分层
-
-关键内容必须使用以下类型之一：
-
-- `fact`：外部可核验事实；
-- `calculation`：基于明确假设和公式得到的结果；
-- `inference`：由证据推出但不是来源直接陈述；
-- `opinion`：作者判断；
-- `unknown`：暂未核验。
-
-## 5. Scope 是硬字段
-
-涉及政策、规则、统计、行业趋势时必须标注范围：
-
+## 6. Scope
 `global | national | province | city | institution | company | single_case | unknown`
 
-不得把 `single_case` 或 `company` 自动提升成 `national` 或行业普遍结论。
+Scope 扩大视为事实错误。
 
-## 6. Evidence Ledger
-
-所有准备进入标题、导语、关键结论的事实，必须写入 `research.claims`：
+## 7. Evidence Ledger
+关键事实必须进入 `research.claims`，并符合 `claim.schema.json`。
 
 ```yaml
 - claim_id: C001
@@ -77,11 +77,8 @@ resources: [<optional external files>]
   note: ""
 ```
 
-验证状态：`verified | partial | disputed | unsupported | false | unknown`。
-
-## 7. Calculation Ledger
-
-所有算账、比例、增速、收益、房贷等自行计算必须记录：
+## 8. Calculation Ledger
+自行计算必须记录：
 
 ```yaml
 - calc_id: K001
@@ -90,48 +87,75 @@ resources: [<optional external files>]
   formula: "..."
   inputs: {}
   result: "..."
+  sensitivity: ""
   verification: reproduced
 ```
 
-结果不能脱离假设单独进入标题。
+## 9. Claim → Architecture → Writing 证据链
+正文不得切断证据引用。
 
-## 8. Originality Gate
-
-进入正式写作前必须检查 `research.originality_gate`。
-
-至少满足一种有效增量：
-
-- 作者亲测
-- 自主计算
-- 一手职业经验
-- 原始截图/数据整理
-- 独立对比
-- 采访/小调查
-- 新框架/新综合
-
-如果没有，允许继续写热点快讯，但必须标记 `commodity_content_risk: high`；标准/深度文章原则上不得无提示进入 ViralWriter。
-
-## 9. 失败与缺失处理
-
-缺数据时写 `unknown/N/A`，不能补猜。
-
-无法完成真实竞争扫描时，必须写：
+每个正文 section 至少包含：
 
 ```yaml
-competition:
-  status: unverified
+- section_id: W01
+  source_section_id: A01
+  text: "..."
+  claim_ids: [C001]
+  calc_ids: [K001]
+  case_ids: []
+  statement_types: [fact, calculation]
 ```
 
-不得把模型记忆当作“市场已经这样写”的证据。
+PublisherQA 必须沿此链审计，而不是重新猜测正文来源。
 
-## 10. 状态门
+## 10. Originality Gate
+按 `../docs/ORIGINALITY-RUBRIC.md` 分 A/B/C 级原创资产。
 
-推荐状态迁移：
+标准/深度模式通过条件：
+- 至少 1 个 A 级；或
+- 至少 2 个 B 级。
 
-`signal -> topic_selected -> researched -> architected -> drafted -> visually_planned -> qa_passed -> published -> reviewed`
+C 级资产不能单独通过。
 
-任何 Skill 可因关键证据问题把状态退回上一阶段。
+Flash 模式可 conditional，但必须明确资讯属性。
 
-## 11. 可回归测试
+## 11. Production Mode
+按 `../docs/PRODUCTION-MODES.md`：
+- `flash`
+- `standard`
+- `deep`
 
-修改 Skill 后至少跑 `benchmarks/cases.yaml` 中对应测试项。若核心失败条件恶化，不得仅因文案更流畅就认定升级成功。
+事实门槛不因模式降低；只减少研究深度、结构复杂度和字数。
+
+## 12. Visual Ready Gate
+视觉规划和视觉执行分开：
+- `planning_status`
+- `execution_status`
+- `assets_ready`
+
+若公众号文章所需资产未完成，PublisherQA 不得给最终 A 可发布。
+
+## 13. Publishing Gate
+通过 QA 后必须进入 PublishingPlan，而不是直接把“发布”当黑盒。
+
+PublishingPlan 至少确定：最终标题、封面资产、摘要、发布窗口、紧迫度、分发渠道、后续承接、1h/24h/72h 数据计划。
+
+## 14. Competition Scan
+只能对实际扫描到的样本做结论。禁止写“全网没人写”。推荐表述：
+“在本次已扫描样本中未发现”。
+
+## 15. Score Anchors
+0–5 分必须使用明确锚点，见 TopicHunter。不得凭感觉给出无解释分值。
+
+## 16. Experiment Preregistration
+如 GrowthReviewer 提出可验证假设，下一轮正式实验应在发布前登记 `experiment.*`，避免事后故事化归因。
+
+## 17. 失败处理
+缺数据写 `unknown/N/A`。
+无法竞争扫描：`competition.status: unverified`。
+无法取得图片：`execution_status: unavailable`。
+关键事实失证：`workflow.gate: blocked` 并退回 ResearchPack。
+
+## 18. 回归测试
+修改 Skill 后至少运行 `../benchmarks/cases.yaml` 对应案例。
+文案更顺不能覆盖 Scope、假新闻、重复、计算、伪亲测等能力退化。
