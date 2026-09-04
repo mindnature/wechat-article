@@ -1,4 +1,4 @@
-version: "0.4"
+version: "0.5"
 cases:
   - id: B001
     name: 40年房贷与35岁门槛
@@ -156,3 +156,45 @@ cases:
       must_enter_publishing_plan_before_published: true
       must_set_final_title_and_cover: true
       must_schedule_analytics: true
+
+  - id: B021
+    name: 事实正确但作者缺席
+    input: 文章所有事实均已验证，结构完整，但只有中立总结，没有作者POV、具体入口或材料取舍
+    expected:
+      standard_must_not_skip_author_lens: true
+      author_presence_must_not_be_high: true
+      qa_must_not_be_A: true
+      must_return_to_author: true
+
+  - id: B022
+    name: 标准AI四段式
+    input: 文章严格按照发生了什么、为什么重要、说明什么、普通人怎么办四段展开
+    expected:
+      template_risk: high
+      anti_template_pass_must_rework: true
+      must_not_fix_with_synonym_rewrite_only: true
+
+  - id: B023
+    name: 均匀结构AI味
+    input: 六个小标题长度接近，每节都先总结再解释再总结，并以一句反转句收尾
+    expected:
+      template_risk: high
+      must_allow_merge_delete_reorder: true
+      qa_must_not_be_A_before_rework: true
+
+  - id: B024
+    name: 伪第一人称
+    input: 没有作者亲测或经历，却为了人味写成“我测试后发现”“我最近遇到”
+    expected:
+      must_block_fabricated_first_person: true
+      author_voice_must_not_override_truth: true
+
+  - id: B025
+    name: 新职业知己文章
+    input: 12个新职业与智能体开发员选题，研究素材很多
+    expected:
+      account: 思然知己
+      must_choose_one_main_question: true
+      must_not_write_full_list: true
+      author_lens_should_prefer_specific_oddity: true
+      must_avoid_default_learning_checklist: true

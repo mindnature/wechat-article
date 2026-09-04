@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "article-state.schema.json",
-  "title": "WeChat ArticleState v0.4",
+  "title": "WeChat ArticleState v0.5",
   "type": "object",
-  "required": ["version", "article_id", "account", "production", "workflow", "signal", "topic", "research", "architecture", "writing", "visual", "qa", "publishing", "publication", "performance", "learning"],
+  "required": ["version", "article_id", "account", "production", "workflow", "signal", "topic", "research", "author", "architecture", "writing", "visual", "qa", "publishing", "publication", "performance", "learning"],
   "properties": {
-    "version": {"const": "0.4"},
+    "version": {"const": "0.5"},
     "article_id": {"type": "string"},
     "account": {"type": "string"},
     "production": {
@@ -22,7 +22,7 @@
       "type": "object",
       "required": ["stage", "gate", "blocked_by", "return_to", "retry_count"],
       "properties": {
-        "stage": {"enum": ["signal", "topic", "research", "architecture", "writing", "visual", "qa", "publishing", "published", "reviewed"]},
+        "stage": {"enum": ["signal", "topic", "research", "author", "architecture", "writing", "visual", "qa", "publishing", "published", "reviewed"]},
         "gate": {"enum": ["ready", "blocked", "rework", "manual_review"]},
         "blocked_by": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "return_to": {"type": "string"},
@@ -41,16 +41,52 @@
         "originality_gate": {"type": "object"}
       }
     },
+    "author": {
+      "type": "object",
+      "required": ["why_write", "pov", "entry_point", "material_to_ignore", "narrative_choice", "voice_profile", "voice_traits", "banned_moves", "humanity_test"],
+      "properties": {
+        "why_write": {"type": "string"},
+        "pov": {"type": "array", "items": {"type": "string"}},
+        "entry_point": {
+          "type": "object",
+          "required": ["type", "content", "evidence_refs"],
+          "properties": {
+            "type": {"type": "string"},
+            "content": {"type": "string"},
+            "evidence_refs": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "personal_material": {"type": "array"},
+        "material_to_ignore": {"type": "array"},
+        "narrative_choice": {"enum": ["", "single-thread", "scene-led", "evidence-led", "argument-led", "case-led", "diary-led", "compare-led"]},
+        "voice_profile": {"type": "string"},
+        "voice_traits": {"type": "array", "items": {"type": "string"}},
+        "preferred_moves": {"type": "array", "items": {"type": "string"}},
+        "banned_moves": {"type": "array", "items": {"type": "string"}},
+        "first_person_level": {"enum": ["none", "low", "medium", "high"]},
+        "looseness": {"enum": ["tight", "natural", "conversational"]},
+        "humanity_test": {"type": "object"}
+      }
+    },
     "architecture": {"type": "object"},
     "writing": {
       "type": "object",
-      "required": ["title_candidates", "selected_title", "sections", "body_status"],
+      "required": ["title_candidates", "selected_title", "sections", "body_status", "anti_template_pass"],
       "properties": {
         "title_candidates": {"type": "array"},
         "selected_title": {"type": "string"},
         "sections": {"type": "array", "items": {"$ref": "writing-section.schema.json"}},
         "body_status": {"enum": ["not_started", "draft", "revised", "final"]},
         "word_count": {"type": ["integer", "null"], "minimum": 0},
+        "anti_template_pass": {
+          "type": "object",
+          "required": ["status", "detected_patterns", "edits_made"],
+          "properties": {
+            "status": {"enum": ["not_run", "pass", "rework"]},
+            "detected_patterns": {"type": "array"},
+            "edits_made": {"type": "array"}
+          }
+        },
         "risk_notes": {"type": "array"}
       }
     },
@@ -66,14 +102,7 @@
         "rights_risks": {"type": "array"}
       }
     },
-    "qa": {
-      "type": "object",
-      "properties": {
-        "status": {"enum": ["not_run", "A", "B", "C"]},
-        "blocking_issues": {"type": "array"},
-        "recommended_fixes": {"type": "array"}
-      }
-    },
+    "qa": {"type": "object"},
     "publishing": {"type": "object"},
     "publication": {"type": "object"},
     "performance": {"type": "object"},
@@ -86,7 +115,8 @@
       "then": {
         "properties": {
           "visual": {"properties": {"assets_ready": {"const": true}}},
-          "workflow": {"properties": {"gate": {"const": "ready"}}}
+          "workflow": {"properties": {"gate": {"const": "ready"}}},
+          "writing": {"properties": {"anti_template_pass": {"properties": {"status": {"const": "pass"}}}}}
         }
       }
     }

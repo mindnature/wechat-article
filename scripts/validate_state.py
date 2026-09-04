@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate WeChat ArticleState v0.4 structure and cross references."""
+"""Validate WeChat ArticleState v0.5 structure, evidence lineage and author voice gates."""
 
 from __future__ import annotations
 
@@ -19,13 +19,14 @@ STAGE_ORDER = {
     "signal": 0,
     "topic": 1,
     "research": 2,
-    "architecture": 3,
-    "writing": 4,
-    "visual": 5,
-    "qa": 6,
-    "publishing": 7,
-    "published": 8,
-    "reviewed": 9,
+    "author": 3,
+    "architecture": 4,
+    "writing": 5,
+    "visual": 6,
+    "qa": 7,
+    "publishing": 8,
+    "published": 9,
+    "reviewed": 10,
 }
 
 
@@ -121,6 +122,8 @@ def validate_workflow(state: dict[str, Any]) -> list[str]:
             errors.append("qa.status=A requires no blocking_issues")
         if gate != "ready":
             errors.append("qa.status=A requires workflow.gate=ready")
+        if state.get("writing", {}).get("anti_template_pass", {}).get("status") != "pass":
+            errors.append("qa.status=A requires writing.anti_template_pass.status=pass")
 
     if stage in {"publishing", "published", "reviewed"}:
         if qa.get("status") != "A":
@@ -154,6 +157,40 @@ def validate_originality(state: dict[str, Any]) -> list[str]:
     return errors
 
 
+def validate_author_voice(state: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    mode = state.get("production", {}).get("mode")
+    stage = state.get("workflow", {}).get("stage")
+    if stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["architecture"]:
+        return errors
+    if mode == "flash":
+        return errors
+
+    author = state.get("author", {})
+    if not author.get("why_write", "").strip():
+        errors.append("standard/deep architecture requires author.why_write")
+    if not author.get("pov"):
+        errors.append("standard/deep architecture requires at least one author.pov")
+    entry = author.get("entry_point", {}) or {}
+    if not entry.get("content", "").strip():
+        errors.append("standard/deep architecture requires a concrete author.entry_point")
+    if not author.get("narrative_choice"):
+        errors.append("standard/deep architecture requires author.narrative_choice")
+    if not author.get("voice_profile", "").strip():
+        errors.append("standard/deep architecture requires author.voice_profile")
+    if not author.get("material_to_ignore"):
+        errors.append("author.material_to_ignore must record at least one deliberate omission")
+
+    humanity = author.get("humanity_test", {}) or {}
+    if humanity.get("generic_ai_risk") == "high":
+        errors.append("author humanity test: generic_ai_risk is high")
+    if humanity.get("template_risk") == "high":
+        errors.append("author humanity test: template_risk is high")
+    if humanity.get("author_specificity") == "low":
+        errors.append("author humanity test: author_specificity is low")
+    return errors
+
+
 def validate_calculations(state: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     for calc in state.get("research", {}).get("calculations", []) or []:
@@ -171,6 +208,7 @@ def validate(path: Path) -> list[str]:
     errors.extend(validate_cross_refs(state))
     errors.extend(validate_workflow(state))
     errors.extend(validate_originality(state))
+    errors.extend(validate_author_voice(state))
     errors.extend(validate_calculations(state))
     return errors
 

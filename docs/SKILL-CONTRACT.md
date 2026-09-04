@@ -1,6 +1,6 @@
-# Skill Contract｜v0.4
+# Skill Contract｜v0.5
 
-所有子 Skill 必须遵循统一状态、Schema 和资源契约，避免自然语言接力造成漂移。
+所有子 Skill 必须遵循统一状态、Schema、证据链与作者声音契约。
 
 ## 1. Front Matter
 
@@ -8,7 +8,7 @@
 ---
 name: <kebab-case>
 description: <一句话职责>
-version: "0.4"
+version: "0.5"
 reads: [<ArticleState fields>]
 writes: [<ArticleState fields>]
 resources: [<optional external files>]
@@ -17,7 +17,7 @@ resources: [<optional external files>]
 
 - `reads` 只声明 ArticleState 字段。
 - `writes` 只声明本 Skill 可修改字段。
-- `resources` 声明 Ledger、learning、账号画像等持久化资源。
+- `resources` 声明 Ledger、learning、账号画像、Voice Profile 等资源。
 
 ## 2. 共享状态与机器验证
 
@@ -28,18 +28,13 @@ resources: [<optional external files>]
 
 ## 3. Stage 与 Gate 分离
 
-禁止用一个 `status` 同时表达流程位置和失败状态。
-
 `workflow.stage`：
-`signal | topic | research | architecture | writing | visual | qa | publishing | published | reviewed`
+`signal | topic | research | author | architecture | writing | visual | qa | publishing | published | reviewed`
 
 `workflow.gate`：
 `ready | blocked | rework | manual_review`
 
-被阻断时同时记录：
-- `blocked_by`
-- `return_to`
-- `retry_count`
+被阻断时同时记录 `blocked_by`、`return_to`、`retry_count`。
 
 ## 4. 输出三层
 
@@ -50,112 +45,130 @@ resources: [<optional external files>]
 
 无法写入资源时标记 `not_persisted`，不能假装已学习/去重。
 
-## 5. 事实类型
-- `fact`
-- `calculation`
-- `inference`
-- `opinion`
-- `unknown`
+## 5. 事实层保持严格
 
-## 6. Scope
-`global | national | province | city | institution | company | single_case | unknown`
+事实类型：`fact | calculation | inference | opinion | unknown`。
+
+Scope：`global | national | province | city | institution | company | single_case | unknown`。
 
 Scope 扩大视为事实错误。
 
-## 7. Evidence Ledger
-关键事实必须进入 `research.claims`，并符合 `claim.schema.json`。
+## 6. Evidence / Calculation Ledger
 
-```yaml
-- claim_id: C001
-  text: "..."
-  type: fact
-  scope: national
-  source_ids: [S001]
-  verification: verified
-  confidence: high
-  title_safe: true
-  note: ""
-```
+关键事实进入 `research.claims`；自行计算进入 `research.calculations`。
 
-## 8. Calculation Ledger
-自行计算必须记录：
+正文继续保持：
+`Source → Claim/Calc → Architecture → Writing`。
 
-```yaml
-- calc_id: K001
-  question: "..."
-  assumptions: []
-  formula: "..."
-  inputs: {}
-  result: "..."
-  sensitivity: ""
-  verification: reproduced
-```
+证据链必须可审计，但证据ID和后台结构不得泄漏成前台文风。
 
-## 9. Claim → Architecture → Writing 证据链
-正文不得切断证据引用。
+## 7. Originality Gate
 
-每个正文 section 至少包含：
+按 `../docs/ORIGINALITY-RUBRIC.md`：
+- Standard：≥1A 或 ≥2B
+- Deep：≥1A+1B
+- Flash：可 conditional
 
-```yaml
-- section_id: W01
-  source_section_id: A01
-  text: "..."
-  claim_ids: [C001]
-  calc_ids: [K001]
-  case_ids: []
-  statement_types: [fact, calculation]
-```
+Originality 只回答“有没有信息增量”，不等于 Author Voice。
 
-PublisherQA 必须沿此链审计，而不是重新猜测正文来源。
+## 8. Author Gate｜v0.5新增
 
-## 10. Originality Gate
-按 `../docs/ORIGINALITY-RUBRIC.md` 分 A/B/C 级原创资产。
+Standard / Deep 在 ResearchPack 后必须经过 AuthorLens。
 
-标准/深度模式通过条件：
-- 至少 1 个 A 级；或
-- 至少 2 个 B 级。
+最少记录：
+- `author.why_write`
+- `author.pov`
+- `author.entry_point`
+- `author.material_to_ignore`
+- `author.narrative_choice`
+- `author.voice_profile`
+- `author.humanity_test`
 
-C 级资产不能单独通过。
+原则：
+- 必须有明确取舍，不允许把 ResearchPack 全写进正文。
+- 第一人称不是必须；作者性可以来自判断、入口、选择与不确定性。
+- 禁止伪造经历来制造“人味”。
 
-Flash 模式可 conditional，但必须明确资讯属性。
+Flash 可跳过完整 AuthorLens，但必须至少有一个具体入口和一个明确判断。
 
-## 11. Production Mode
-按 `../docs/PRODUCTION-MODES.md`：
-- `flash`
-- `standard`
-- `deep`
+## 9. 后台结构化，前台自由
 
-事实门槛不因模式降低；只减少研究深度、结构复杂度和字数。
+ArticleArchitect / ViralWriter 不得把系统流程直接投射成文章模板。
 
-## 12. Visual Ready Gate
-视觉规划和视觉执行分开：
-- `planning_status`
-- `execution_status`
-- `assets_ready`
+不再强制：
+- 固定情绪曲线
+- 前300字同时完成四个钩子任务
+- 2–4句固定段落
+- 每300–500字强制新增信息
+- What→Why→So what→How
+- 结尾行动清单
 
-若公众号文章所需资产未完成，PublisherQA 不得给最终 A 可发布。
+详见 `../docs/AUTHOR-VOICE.md`。
 
-## 13. Publishing Gate
-通过 QA 后必须进入 PublishingPlan，而不是直接把“发布”当黑盒。
+## 10. Narrative Choice
 
-PublishingPlan 至少确定：最终标题、封面资产、摘要、发布窗口、紧迫度、分发渠道、后续承接、1h/24h/72h 数据计划。
+每篇只选一个主推进方式：
+`single-thread | scene-led | evidence-led | argument-led | case-led | diary-led | compare-led`。
 
-## 14. Competition Scan
-只能对实际扫描到的样本做结论。禁止写“全网没人写”。推荐表述：
-“在本次已扫描样本中未发现”。
+结构服务作者 POV，而不是为“完整”服务。
 
-## 15. Score Anchors
-0–5 分必须使用明确锚点，见 TopicHunter。不得凭感觉给出无解释分值。
+## 11. Anti-Template Pass
 
-## 16. Experiment Preregistration
-如 GrowthReviewer 提出可验证假设，下一轮正式实验应在发布前登记 `experiment.*`，避免事后故事化归因。
+Standard / Deep 完稿后必须执行 `writing.anti_template_pass`。
+
+检查重点：
+- 结构是否过于可预测
+- 每节是否长度/功能过于均匀
+- 抽象过渡句是否过密
+- 是否机械反转
+- 是否自动生成方法论/建议清单
+- 去掉账号名后是否任何AI号都能发布
+
+未 pass 不得进入最终 QA A级。
+
+## 12. Voice Profile
+
+账号定位见 `../skills/shared/account-profiles.md`。
+具体声音见 `../skills/shared/voice-profiles.md`。
+
+Account Profile 决定写什么；Voice Profile 决定怎么像这个账号的人在说。
+
+## 13. Visual Ready Gate
+
+视觉规划和执行分开：`planning_status`、`execution_status`、`assets_ready`。
+
+资产未完成，PublisherQA 不得给最终 A。
+
+## 14. Publishing Gate
+
+QA A 后进入 PublishingPlan，确定最终标题、封面、摘要、发布窗口、分发与数据计划。
+
+## 15. Production Mode
+
+按 `../docs/PRODUCTION-MODES.md`：`flash | standard | deep`。
+
+模式只改变研究/结构深度，不降低事实、Scope、版权等硬门。
+
+## 16. Competition / Score / Experiment
+
+- Competition 只能对实际扫描样本下结论。
+- 0–5评分必须使用 TopicHunter 明确锚点。
+- 增长实验尽量发布前登记 `experiment.*`，避免事后归因。
 
 ## 17. 失败处理
-缺数据写 `unknown/N/A`。
-无法竞争扫描：`competition.status: unverified`。
-无法取得图片：`execution_status: unavailable`。
-关键事实失证：`workflow.gate: blocked` 并退回 ResearchPack。
+
+缺数据：`unknown/N/A`。
+关键事实失证：退回 research。
+作者视角空泛：退回 author。
+模板风险高：退回 writing/author。
+视觉未执行：退回 visual。
 
 ## 18. 回归测试
+
 修改 Skill 后至少运行 `../benchmarks/cases.yaml` 对应案例。
-文案更顺不能覆盖 Scope、假新闻、重复、计算、伪亲测等能力退化。
+
+v0.5 新增不可退化项：
+- AuthorLens 不能被跳过（Standard/Deep）
+- Author POV/具体入口不得为空
+- Anti-Template Pass 必须真实运行
+- QA A 时 Author Presence 不能 low、Template Risk 不能 high

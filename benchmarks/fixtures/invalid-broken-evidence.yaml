@@ -1,4 +1,4 @@
-version: "0.4"
+version: "0.5"
 article_id: "fixture-invalid-broken-evidence"
 account: "思然修远"
 created_at: ""
@@ -43,6 +43,27 @@ research:
     score: 0
     commodity_content_risk: high
     missing_original_material: ["需要A级原创资产"]
+author:
+  why_write: "故意失败样例仍提供作者字段，以确保失败不是因为缺少author。"
+  pov: ["示例判断"]
+  entry_point:
+    type: detail
+    content: "具体入口"
+    evidence_refs: [C001]
+  personal_material: []
+  material_to_ignore: ["无关背景"]
+  narrative_choice: argument-led
+  voice_profile: "思然修远"
+  voice_traits: ["克制"]
+  preferred_moves: []
+  banned_moves: []
+  first_person_level: low
+  looseness: natural
+  humanity_test:
+    generic_ai_risk: low
+    template_risk: low
+    author_specificity: medium
+    note: ""
 architecture: {}
 writing:
   title_candidates: []
@@ -57,6 +78,10 @@ writing:
       statement_types: [fact]
   body_status: final
   word_count: 1800
+  anti_template_pass:
+    status: pass
+    detected_patterns: []
+    edits_made: []
   risk_notes: []
 visual:
   planning_status: complete
@@ -69,6 +94,10 @@ qa:
   status: A
   blocking_issues: []
   recommended_fixes: []
+  voice_review:
+    author_presence: medium
+    template_risk: low
+    voice_match: medium
 publishing:
   plan_status: not_started
 publication: {}

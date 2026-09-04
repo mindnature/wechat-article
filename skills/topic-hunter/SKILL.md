@@ -1,7 +1,7 @@
 ---
 name: topic-hunter
 description: 将原始信号加工成高潜公众号选题，完成去重、Scope、真实竞争扫描、账号路由、模式选择和锚定评分。
-version: "0.4"
+version: "0.5"
 reads: [signal, account, production]
 writes: [signal, topic, production, workflow]
 resources: [../../ledger/content-ledger.csv, ../shared/account-profiles.md, ../../learning/account-baselines.yaml, ../../docs/PRODUCTION-MODES.md]
@@ -9,10 +9,10 @@ resources: [../../ledger/content-ledger.csv, ../shared/account-profiles.md, ../.
 
 # TopicHunter｜爆款选题与角度
 
-遵循 `../../schemas/article-state.yaml`、`article-state.schema.json` 与 `../../docs/SKILL-CONTRACT.md`。
+遵循 v0.5 ArticleState、Schema 与 Skill Contract。
 
 ## 目标
-把“值得关注的事件”加工成“值得特定读者点击、读完和转发的选题”。本 Skill 不写正文。
+把“值得关注的事件”加工成“值得特定读者点击、读完和转发的选题”。本 Skill 不写正文，也不替代 AuthorLens。
 
 ## Step 0｜去重
 检查 Content Ledger：
@@ -40,6 +40,8 @@ duplicate 只有出现新事实、新数据、新政策、新案例或完全不�
 至少覆盖：身份、利益、冲突、数据、决策、机制、人性、商业、一手增量。
 
 优先“情理之中、预料之外”，但不能为了反差扩大 Scope 或制造事实。
+
+注意：TopicHunter 只决定“什么值得写”；作者为什么非写不可、从哪个具体细节进入，由 AuthorLens 再做一次选择。
 
 ## Step 4｜模式选择
 读取 `PRODUCTION-MODES.md`，选择：
