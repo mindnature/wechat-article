@@ -2,8 +2,9 @@
 name: viral-writer
 description: 基于已验证选题、研究包和证据绑定架构生成可发布公众号正文，并保持事实、计算、推断和观点边界。
 version: "0.3"
-reads: [topic, research, architecture, account, learning]
+reads: [topic, research, architecture, account]
 writes: [writing, status]
+resources: [../shared/account-profiles.md, ../../learning/proven-patterns.md, ../../learning/hypotheses.yaml]
 ---
 
 # ViralWriter｜公众号成稿
