@@ -1,102 +1,36 @@
-# Author Voice Architecture｜v0.5
+# Author Voice Architecture｜v0.6
 
-v0.5 的核心原则：
+v0.6 的核心判断：
 
-> 后台高度结构化，前台高度自由。
+> 文风AI不是靠更多形容词规则解决，而要改变素材、判断、生成和评审的机制。
 
-Evidence Ledger、Scope、Calculation、Schema、Validator 继续保持严格；但这些工程结构不能直接变成文章的可见结构。
+## 1. 深主旨来自竞争，不来自一次性“想一个角度”
+AuthorLens 必须生成3个POV，并主动指出每个为什么可能仍然平庸。最容易被任何AI账号推出的角度先淘汰。
 
-## 1. 为什么需要 Author Layer
+## 2. 作者性来自真实取舍
+Material Graveyard 让“哪些资料不写”可审计。作者不是把全部研究结果展示给读者，而是围绕 selected POV 放弃一半以上非核心信息单元。
 
-v0.4 的主要失败模式是：
-- 研究正确
-- 证据完整
-- 结构合理
-- 文章却像AI说明文
+## 3. 真犹豫必须有材料来源
+允许作者不确定，但只能绑定 ResearchPack 的 Uxxx：冲突信源、partial evidence、missing data、计算假设、Scope边界、预测。
 
-原因不是“AI词太多”，而是模型会把后台流程自然投射到前台：
+没有真实不确定性，就不要表演犹豫。
 
-`事实 → 解释 → 反转 → 方法论 → 建议`
+## 4. Voice Profile 只是边界
+“自然、口语、有判断”没有足够可操作性。
 
-当每篇都这样写，文章就会高度可预测。
+真正Voice来自用户确认的正/反例，详见 `VOICE-CALIBRATION.md` 与 `voice-samples/manifest.yaml`。
 
-## 2. Author ≠ Originality
+## 5. 分段生成优先于连续全文生成
+连续生成会自然形成统一节奏并一路延续。v0.6 优先每个segment独立brief、独立调用，再做重排/删减。
 
-Originality 回答：这篇有没有信息增量？
+无法隔离上下文时必须记录 fallback。
 
-Author Voice 回答：为什么是这个作者在写？
+## 6. 同上下文自评不算文风验证
+Writer/QA共享同一上下文时共享盲点。
 
-自主计算、独立综合可以让内容原创，但仍可能没有作者感。
+Standard/Deep 必须由 fresh session 或 different model 做 BlindReview，Reviewer 不得看到 pipeline 规则。
 
-作者性至少来自以下一种：
-- 真实第一手经历
-- 明确且有证据边界的判断
-- 对材料的独特取舍
-- 一个具体观察入口
-- 一种稳定的提问方式
-- 对不确定性的真实表达
+## 7. 最终评价
+`Truth + Tension + POV Competition + Selectivity + Real Uncertainty + Independent Review`
 
-## 3. Narrative Choice 不等于模板
-
-ArticleArchitect 不再强制统一情绪曲线，也不要求每篇完成固定“钩子四件套”。
-
-每篇只选择一个主推进方式：
-- single-thread
-- scene-led
-- evidence-led
-- argument-led
-- case-led
-- diary-led
-- compare-led
-
-结构服务作者判断，不反过来。
-
-## 4. 允许文章不完整
-
-公众号文章不需要像报告一样覆盖所有事实。
-
-允许：
-- 只回答一个问题
-- 少讲背景
-- 不提供行动清单
-- 不总结全部影响
-- 保留开放判断
-- 结尾停在一个具体问题或事实
-
-前提是：没有歪曲证据，不遗漏会改变核心结论的关键限定。
-
-## 5. Human Texture
-
-人类作者常有不均匀性：
-- 段落长短不完全一致
-- 有的地方展开，有的地方略过
-- 有明确偏好和选择
-- 会承认不知道
-- 不会每300字都总结一次
-- 不会每篇都反转
-
-系统允许这种不均匀，但不允许用虚构经历、故意错字、低质量口语来伪造“人味”。
-
-## 6. Anti-Template Pass
-
-Writer 完稿后至少做一次“去流程痕迹”检查：
-- 是否能看出标准 What/Why/So what/How 框架？
-- 是否每节长度过于接近？
-- 是否连续出现抽象总结句？
-- 是否过渡语多于具体信息？
-- 是否每节都先概括再解释？
-- 是否结尾自动升华或列建议？
-
-若答案明显为是，优先重排结构和删句，不只是同义改写。
-
-## 7. 评价标准
-
-最终文章同时满足：
-- Truth：事实可信
-- Point of View：有明确判断
-- Specificity：有具体细节
-- Selectivity：有取舍
-- Rhythm：节奏不机械
-- Voice：符合账号声音
-
-“语言自然”不是单独目标，而是以上结果共同产生的表现。
+“像人”不是目标函数；它应该是这些机制共同工作的结果。
