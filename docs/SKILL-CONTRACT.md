@@ -1,6 +1,6 @@
-# Skill Contract｜v0.6
+# Skill Contract｜v0.7
 
-所有子 Skill 遵循统一状态、证据链、深度生成和独立盲审契约。
+所有子 Skill 遵循统一状态、证据链、深度生成、读者交付与独立盲审契约。
 
 ## 1. Stage / Gate
 `workflow.stage`：
@@ -8,78 +8,132 @@
 
 `workflow.gate`：`ready | blocked | rework | manual_review`。
 
-## 2. 事实层
-保持 v0.5 的 Evidence / Calculation / Scope 规则不变。新增 `research.uncertainty_nodes`：只有真实证据不确定性才能驱动犹豫语气。
+## 2. Truth Gate
+Evidence / Calculation / Scope 继续保持严格。`research.uncertainty_nodes` 只允许真实证据不确定性驱动犹豫表达。
 
-## 3. Tension Gate
-Standard / Deep 在 Research 前必须通过 `topic.tension_test`：
-- 具体 contradiction/unresolved question；
+## 3. Tension + Reader Promise Gate
+Standard / Deep 在 Research 前必须同时通过：
+
+### Tension Test
+- 具体 contradiction / unresolved question；
 - 具体 decision_change；
 - exclusive material path 或 strong judgment candidate 至少一个成立。
 
-只有公开资料+第二显然观点，不应包装成深度稿。
+### Reader Promise Test
+- promise 具体；
+- provisional_answer 不为空；
+- knowledge/tool/decision类文章能预览3–5个交付单元；
+- “了解趋势/提高认知”不能作为有效承诺。
 
 ## 4. Author Competition Gate
 AuthorLens 必须：
-- 生成恰好3个真正不同的 POV candidates；
-- 每个写 banality_self_critique；
+- 恰好3个真正不同的 POV；
+- 每个都有 banality_self_critique；
+- 每个评价 novelty / reader_value / specificity / frameworkability / evidence_strength；
 - 淘汰至少2个；
-- selected POV 有具体 decision_change；
-- Standard/Deep 记录 Material Graveyard，`discarded_units >= retained_units`。
+- selected POV 的 reader_value / specificity / frameworkability / evidence_strength 不得过低；
+- 生成 `provisional_core_answer`；
+- Material Graveyard 满足 `discarded_units >= retained_units`。
 
-## 5. Real Uncertainty
-第一人称犹豫/保留判断只能引用 Uxxx。不许凭空生成“我也不确定”来模拟人味。
+最深的POV不自动胜出；必须兼顾可读和可交付。
 
-## 6. Voice Calibration
-`voice-profiles.md` 只是低权重边界。
+## 5. Reader Contract Gate
+ArticleArchitect 必须冻结：
+- promise_type
+- promise
+- core_answer
+- answer_shape
+- expected_units
+- delivery_units
 
-真正 Voice 依据 `voice-samples/manifest.yaml` 中用户确认的正/反例。历史稿未被用户明确标注，不得自动当正例。
+标题问什么，正文必须显式交付什么。
 
-## 7. Segmented Generation
-Standard / Deep Writer 先建立局部 briefs，再优先分 invocation 生成 segments。
+对于 `which | how | list`，默认使用 `numbered_framework`，并至少3个Delivery Units。
 
-必须记录：
-- strategy: isolated_segments | single_context_fallback
+## 6. Thesis Prominence Gate
+Standard / Deep 默认要求核心结论在第一屏出现：
+- `required_in_first_screen=true`
+- 默认 `max_chars <= 300`
+
+强叙事/调查稿可以延迟，但必须记录 `delayed_reason`。
+
+## 7. Macro Structure Rule
+01/02/03/04 本身不是AI模板。
+
+知识型、工具型、决策型、政策解读型文章默认允许并鼓励清晰编号。
+
+Anti-Template 只打击微观重复：同长度、同句式、同反转、同总结、同升华。
+
+## 8. Concrete Delivery Gate
+每个 Delivery Unit 至少需要：
+- unit_id
+- label
+- answer
+- concrete_examples
+
+大类词不算具体交付。
+
+例如“文献研究”必须继续拆到：
+`搜索→下载→去重→提取→矩阵→Gap`。
+
+## 9. Segmented Generation + Clarity Pass
+Writer 继续使用：
+- isolated_segments 或 single_context_fallback
 - segment_count
-- isolated_context
 - reorder_pass
 
-初稿后必须单独执行重排/删减 pass，不能只改词。
+但在 BlindReview 前新增 `writing.clarity_pass`：
+- first_screen_excerpt
+- thesis_in_first_screen
+- promise_delivery_status
+- numbered_framework_used
+- missing_delivery_units
+- evidence_overload_first_screen
+- concrete_task_coverage
 
-## 8. Blind Review
-Standard / Deep 在 VisualEditor 前必须执行独立 BlindReview。
+Clarity不过，不进入BlindReview。
 
-有效独立性：`fresh_session | different_model`。
+## 10. Real Uncertainty
+第一人称犹豫/保留判断只能引用 Uxxx。不许用“可能/我也不确定”模拟人味。
 
-`same_context` 不算通过；当前环境不能提供独立上下文时，必须 `pending_external + manual_review`，不能自己给自己盖章。
+## 11. Voice Calibration
+Voice Profile 只是低权重边界；真正风格依据用户确认的正/反 Voice Samples。未确认历史稿不得自动升格为Gold Sample。
 
-Blind reviewer 不得看到：ResearchPack、AuthorLens、Architecture、Anti-Template 规则或 Writer 自评。
+## 12. Blind Review
+Standard / Deep 在 VisualEditor 前必须独立 BlindReview。
 
-## 9. Blind Packet
-只包含纯正文，以及可选的用户确认 Voice 样例匿名混排。Reviewer 必须指出具体AI句/段，而不是只打分。
+有效：`fresh_session | different_model`。
 
-## 10. PublisherQA
-QA 继续负责事实、Scope、计算、版权、视觉；文风主证据改为独立 BlindReview，不再依赖同一上下文的 Voice Match 自评。
+无效：`same_context`。
 
-Standard/Deep QA=A 必须 blind_review pass。
+BlindReview审AI感、语感、Voice，不替代 Reader Contract / Thesis Prominence / Promise Delivery。
 
-## 11. Originality / Visual / Publishing / Learning
-沿用 v0.5：Originality、Visual Ready、PublishingPlan、真实后台数据学习门不降低。
+## 13. PublisherQA
+QA=A 必须同时通过：
+- Truth / Scope / Calculation
+- Originality
+- Thesis Prominence
+- First Screen
+- Promise → Delivery
+- Concrete Delivery
+- Anti-Template
+- Independent BlindReview
+- Visual Ready / Rights / Privacy
 
-## 12. 失败处理
-- 张力浅：回 topic
+## 14. Failure Routing
+- 张力弱/Reader Promise弱：回 topic
 - 材料不足：回 research
-- POV 平庸/取舍不足：回 author
-- 连续生成节奏/AI痕迹：回 writing
-- 无独立评审：manual_review / blind_review
+- POV深但不可交付：回 author
+- Reader Contract不清：回 architecture
+- 核心结论埋太深/标题未兑现/具体任务不足：回 writing/architecture
+- AI语感问题：回 writing，经独立BlindReview复审
 - 视觉未完成：回 visual
 
-## 13. 回归测试
-不可退化项新增：
-- Standard/Deep 必须有 Tension Test
-- AuthorLens 必须3选1而非单次生成
-- Graveyard 必须形成可审计取舍
-- 假犹豫不能没有 Uxxx
-- Writer 必须 segment + reorder
-- same-context BlindReview 必须失败
-- 未确认历史文章不能进入 Voice Gold Samples
+## 15. Regression
+v0.7 不可退化项：
+- “哪些/怎么做”必须有明确编号交付
+- 核心结论不能埋在后半篇
+- 1234不能仅因“规整”被判AI味
+- Delivery Unit不能只有抽象大类
+- 深但frameworkability低的POV不能自动胜出
+- same-context BlindReview仍必须失败
