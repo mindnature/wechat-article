@@ -1,7 +1,7 @@
 ---
 name: publishing-plan
 description: 在QA通过后生成微信公众号发布计划，确定最终标题、封面、摘要、发布时间、分发、承接与数据回收，并可预登记增长实验。
-version: "0.5"
+version: "0.7"
 reads: [topic, author, writing, visual, qa, account, production, workflow, experiment]
 writes: [publishing, experiment, workflow]
 resources: [../../learning/account-baselines.yaml, ../../learning/hypotheses.yaml]
@@ -9,7 +9,7 @@ resources: [../../learning/account-baselines.yaml, ../../learning/hypotheses.yam
 
 # PublishingPlan｜公众号发布策略
 
-遵循 v0.5 ArticleState、Schema 与 Skill Contract。
+遵循 v0.7 ArticleState、Schema 与 Skill Contract。
 
 ## 前置门
 必须：
