@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "writing-section.schema.json",
+  "title": "Writing Section",
+  "type": "object",
+  "required": ["section_id", "text", "claim_ids", "calc_ids", "case_ids", "statement_types"],
+  "properties": {
+    "section_id": {"type": "string", "pattern": "^W[0-9]{2,}$"},
+    "source_section_id": {"type": "string"},
+    "text": {"type": "string"},
+    "claim_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "calc_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "case_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "statement_types": {
+      "type": "array",
+      "items": {"enum": ["fact", "calculation", "inference", "opinion", "unknown"]},
+      "uniqueItems": true
+    }
+  }
+}
