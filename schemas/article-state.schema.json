@@ -37,7 +37,7 @@
       "properties": {
         "source_registry": {"type": "array", "items": {"$ref": "source.schema.json"}},
         "claims": {"type": "array", "items": {"$ref": "claim.schema.json"}},
-        "calculations": {"type": "array", "items": {"type": "object"}},
+        "calculations": {"type": "array", "items": {"$ref": "calculation.schema.json"}},
         "originality_gate": {"type": "object"}
       }
     },
@@ -48,7 +48,7 @@
       "properties": {
         "title_candidates": {"type": "array"},
         "selected_title": {"type": "string"},
-        "sections": {"type": "array"},
+        "sections": {"type": "array", "items": {"$ref": "writing-section.schema.json"}},
         "body_status": {"enum": ["not_started", "draft", "revised", "final"]},
         "word_count": {"type": ["integer", "null"], "minimum": 0},
         "risk_notes": {"type": "array"}
