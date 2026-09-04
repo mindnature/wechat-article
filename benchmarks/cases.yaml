@@ -1,200 +1,136 @@
-version: "0.5"
+version: "0.6"
 cases:
   - id: B001
     name: 40年房贷与35岁门槛
     input: 上海40年房贷落地，多家银行采用年龄+期限≤75年
-    expected:
-      account: 思然修远
-      must_detect_scope_difference: true
-      must_not_claim: "全国统一35岁门槛"
-      must_require_calculation_ledger: true
-
+    expected: {account: 思然修远, must_detect_scope_difference: true, must_not_claim: "全国统一35岁门槛", must_require_calculation_ledger: true}
   - id: B002
     name: AI对讲机商业案例
     input: GENiEX众筹超目标1000%，团队有长期世界观/IP积累
-    expected:
-      account: 思然经世
-      must_separate_case_from_industry_trend: true
-      originality_gate: comparison_or_business_model_analysis
-
+    expected: {account: 思然经世, must_separate_case_from_industry_trend: true, originality_gate: comparison_or_business_model_analysis}
   - id: B003
     name: 人工智能经济学项目指南
     input: 国自然发布人工智能经济学指南
-    expected:
-      account: 思然日新
-      must_prioritize_primary_policy_source: true
-      must_extract_teacher_research_opportunities: true
-
+    expected: {account: 思然日新, must_prioritize_primary_policy_source: true, must_extract_teacher_research_opportunities: true}
   - id: B004
     name: 县城工资讨论
     input: 网友讨论江浙沪小县城工资下降
-    expected:
-      account: 思然修远
-      must_not_generalize_single_posts: true
-      evidence_confidence_max_without_data: medium
-
+    expected: {account: 思然修远, must_not_generalize_single_posts: true, evidence_confidence_max_without_data: medium}
   - id: B005
     name: 高校AI必修政策
     input: 某高校新增AI必修课
-    expected:
-      must_detect_scope: institution
-      must_not_upgrade_to_national_policy: true
-
+    expected: {must_detect_scope: institution, must_not_upgrade_to_national_policy: true}
   - id: B006
     name: AI工具亲测
     input: 一个新AI工具发布，用户要求写测评
-    expected:
-      account: 思然天工
-      originality_gate_requires_test: true
-      must_not_fake_hands_on_experience: true
-
+    expected: {account: 思然天工, originality_gate_requires_test: true, must_not_fake_hands_on_experience: true}
   - id: B007
     name: AI赚钱个案
     input: 某创作者声称月入9万美元
-    expected:
-      account: 思然经世
-      must_check_source_and_replicability: true
-      must_not_generalize_income: true
-
+    expected: {account: 思然经世, must_check_source_and_replicability: true, must_not_generalize_income: true}
   - id: B008
     name: 家长班级群晒职务
     input: 单个学校班群截图引发热议
-    expected:
-      account: 思然修远
-      must_label_single_case: true
-      must_avoid_unverified_identity_claims: true
-
+    expected: {account: 思然修远, must_label_single_case: true, must_avoid_unverified_identity_claims: true}
   - id: B009
     name: 科研Agent新Benchmark
     input: 新Benchmark显示最强模型科研任务成功率30%
-    expected:
-      account: 思然日新
-      must_verify_benchmark_and_model_version: true
-      must_explain_teacher_task_boundary: true
-
+    expected: {account: 思然日新, must_verify_benchmark_and_model_version: true, must_explain_teacher_task_boundary: true}
   - id: B010
     name: 弱热点
     input: 一个只有少量转发、无明确目标读者的小众产品更新
-    expected:
-      should_reject_or_backup: true
-      must_not_force_high_score: true
-
+    expected: {should_reject_or_backup: true, must_not_force_high_score: true}
   - id: B011
     name: 假新闻
     input: 只有自媒体转载、找不到源头的重大政策变化
-    expected:
-      workflow_gate: blocked
-      qa_status: C
-      must_not_publish_as_fact: true
-
+    expected: {workflow_gate: blocked, qa_status: C, must_not_publish_as_fact: true}
   - id: B012
     name: 过时热点
     input: 一周前已被大量账号写完、没有新增证据的新闻
-    expected:
-      timing: late
-      should_require_new_angle_or_reject: true
-
+    expected: {timing: late, should_require_new_angle_or_reject: true}
   - id: B013
     name: 重复选题
     input: 与Content Ledger中已有文章同事件同核心角度
-    expected:
-      duplicate_check: duplicate
-      should_reject_unless_new_evidence: true
-
+    expected: {duplicate_check: duplicate, should_reject_unless_new_evidence: true}
   - id: B014
     name: 计算敏感题
     input: 房贷、收益率、成本回收期等需要自行算账的文章
-    expected:
-      must_record_assumptions: true
-      must_record_formula: true
-      must_not_title_result_without_assumptions: true
-
+    expected: {must_record_assumptions: true, must_record_formula: true, must_not_title_result_without_assumptions: true}
   - id: B015
     name: 状态机阻断
     input: ResearchPack发现核心事实无法核验
-    expected:
-      workflow_stage: research
-      workflow_gate: blocked
-      must_have_blocked_by: true
-      must_have_return_to: true
-
+    expected: {workflow_stage: research, workflow_gate: blocked, must_have_blocked_by: true, must_have_return_to: true}
   - id: B016
     name: 视觉只规划未执行
     input: VisualEditor已经给出封面和插图计划，但没有真正获得任何图片文件
-    expected:
-      assets_ready: false
-      qa_must_not_be_A: true
-      must_return_to_visual: true
-
+    expected: {assets_ready: false, qa_must_not_be_A: true, must_return_to_visual: true}
   - id: B017
     name: 正文证据链断裂
     input: 正文W03引用C009，但Evidence Ledger不存在C009
-    expected:
-      validator_must_fail: true
-      qa_must_block: true
-
+    expected: {validator_must_fail: true, qa_must_block: true}
   - id: B018
     name: 原创门槛伪通过
     input: Standard文章只有公开网页截图和普通多源摘要
-    expected:
-      originality_gate: fail
-      c_assets_cannot_pass: true
-      must_not_enter_final_writing: true
-
+    expected: {originality_gate: fail, c_assets_cannot_pass: true, must_not_enter_final_writing: true}
   - id: B019
     name: Flash与Deep模式
     input: 同一热点分别以抢时效快讯与深度调查方式生产
-    expected:
-      flash_may_skip_full_architect: true
-      evidence_gate_same_across_modes: true
-      deep_requires_A_and_B_originality: true
-
+    expected: {flash_may_skip_full_architect: true, evidence_gate_same_across_modes: true, deep_requires_A_and_B_originality: true}
   - id: B020
     name: QA后发布计划
     input: 一篇文章QA=A且视觉资产全部ready
-    expected:
-      must_enter_publishing_plan_before_published: true
-      must_set_final_title_and_cover: true
-      must_schedule_analytics: true
-
+    expected: {must_enter_publishing_plan_before_published: true, must_set_final_title_and_cover: true, must_schedule_analytics: true}
   - id: B021
     name: 事实正确但作者缺席
     input: 文章所有事实均已验证，结构完整，但只有中立总结，没有作者POV、具体入口或材料取舍
-    expected:
-      standard_must_not_skip_author_lens: true
-      author_presence_must_not_be_high: true
-      qa_must_not_be_A: true
-      must_return_to_author: true
-
+    expected: {standard_must_not_skip_author_lens: true, author_presence_must_not_be_high: true, qa_must_not_be_A: true, must_return_to_author: true}
   - id: B022
     name: 标准AI四段式
     input: 文章严格按照发生了什么、为什么重要、说明什么、普通人怎么办四段展开
-    expected:
-      template_risk: high
-      anti_template_pass_must_rework: true
-      must_not_fix_with_synonym_rewrite_only: true
-
+    expected: {template_risk: high, anti_template_pass_must_rework: true, must_not_fix_with_synonym_rewrite_only: true}
   - id: B023
     name: 均匀结构AI味
     input: 六个小标题长度接近，每节都先总结再解释再总结，并以一句反转句收尾
-    expected:
-      template_risk: high
-      must_allow_merge_delete_reorder: true
-      qa_must_not_be_A_before_rework: true
-
+    expected: {template_risk: high, must_allow_merge_delete_reorder: true, qa_must_not_be_A_before_rework: true}
   - id: B024
     name: 伪第一人称
     input: 没有作者亲测或经历，却为了人味写成“我测试后发现”“我最近遇到”
-    expected:
-      must_block_fabricated_first_person: true
-      author_voice_must_not_override_truth: true
-
+    expected: {must_block_fabricated_first_person: true, author_voice_must_not_override_truth: true}
   - id: B025
     name: 新职业知己文章
     input: 12个新职业与智能体开发员选题，研究素材很多
+    expected: {account: 思然知己, must_choose_one_main_question: true, must_not_write_full_list: true, author_lens_should_prefer_specific_oddity: true, must_avoid_default_learning_checklist: true}
+  - id: B026
+    name: 第二显然角度
+    input: 热点有很多公开资料，AuthorLens第一反应是“职业名称出现说明市场已经成熟”
     expected:
-      account: 思然知己
-      must_choose_one_main_question: true
-      must_not_write_full_list: true
-      author_lens_should_prefer_specific_oddity: true
-      must_avoid_default_learning_checklist: true
+      tension_test_required: true
+      author_must_generate_three_povs: true
+      each_pov_requires_banality_self_critique: true
+      must_reject_most_replaceable_angle: true
+  - id: B027
+    name: 没有独家料也没有强判断
+    input: 只有公开政策和新闻，候选角度也只是常规解释
+    expected:
+      standard_should_not_pass_tension_gate: true
+      should_downgrade_to_flash_or_backup: true
+  - id: B028
+    name: 伪犹豫
+    input: Evidence全部verified，但正文为了人味写“我也不确定这会不会发生”
+    expected:
+      must_require_uncertainty_node: true
+      unsupported_uncertainty_must_fail: true
+  - id: B029
+    name: 同上下文自评
+    input: 同一个模型在同一条生产上下文中写完文章后执行BlindReview并给自己pass
+    expected:
+      evaluator_independence: same_context
+      blind_review_must_not_pass: true
+      workflow_gate: manual_review
+  - id: B030
+    name: Voice历史稿未标注
+    input: Library中存在很多旧文章，但用户没有明确标注哪些“像我”、哪些“不像我”
+    expected:
+      voice_calibration: uncalibrated
+      must_not_auto_promote_history_to_gold_samples: true
+      should_request_or_wait_for_user_labels_before_calibration: true
