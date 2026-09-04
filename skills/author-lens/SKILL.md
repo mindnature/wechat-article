@@ -1,134 +1,139 @@
 ---
 name: author-lens
-description: 在研究完成后提炼作者真正想说的话、个人判断、具体切入点与叙事选择，避免结构化研究直接泄漏成AI说明文。
-version: "0.5"
+description: 在研究完成后生成多个竞争性作者判断，主动淘汰平庸角度，确定具体切入、材料墓地、真实不确定性和叙事选择。
+version: "0.6"
 reads: [topic, research, account, production, workflow]
 writes: [author, workflow]
-resources: [../shared/account-profiles.md, ../shared/voice-profiles.md, ../../docs/AUTHOR-VOICE.md]
+resources: [../shared/account-profiles.md, ../shared/voice-profiles.md, ../shared/voice-samples/manifest.yaml, ../../docs/AUTHOR-VOICE.md, ../../docs/VOICE-CALIBRATION.md]
 ---
 
 # AuthorLens｜作者视角层
 
 本 Skill 位于 ResearchPack 与 ArticleArchitect 之间。
 
-它不负责补事实，也不负责写全文。它只回答一个问题：
-
-> 这篇文章为什么必须由这个账号来写，而不是任何一个通用AI都能写？
+它不负责补事实，也不写全文。它负责把“够像一个观点”继续往下逼一层。
 
 ## 前置门
 - `workflow.stage: research`
 - `workflow.gate: ready`
-- 核心 Claim 已可用
-- Standard / Deep 的 Originality Gate 已满足最低要求
+- 核心 Claim 可用
+- Standard/Deep Originality Gate 达标
+- Standard/Deep `topic.tension_test.status=pass`
 
-## Step 1｜作者为什么想写
-不要复述“因为这是热点”。必须给出更具体的动机：
-- 哪个细节让作者停下来多看了一眼？
-- 哪个说法让作者觉得不对劲、过度简化或被忽略？
-- 这件事与账号长期关注的问题有什么真实连接？
+## Step 1｜为什么写
+不能写“因为这是热点”。要指出：哪个细节、矛盾、措辞、案例或数据让作者觉得值得追。
 
-写入 `author.why_write`。
+## Step 2｜强制生成3个 POV 候选
+必须生成恰好3个，不允许只出1个就停止。
 
-## Step 2｜作者真正的判断
-用1–3句话写出 POV：
-- 作者同意什么？
-- 不同意什么？
-- 最想提醒读者什么？
+```yaml
+- pov_id: P01
+  thesis: ""
+  evidence_refs: [C001]
+  tension: ""
+  decision_change: ""
+  banality_self_critique: "这个角度为什么仍可能只是第二显然？"
+  replaceability: high | medium | low
+  risk: ""
+```
 
-POV 可以是 opinion / inference，但不能伪装成事实。
+三个候选必须彼此真正不同，不能只是换措辞。
 
-## Step 3｜挑一个具体入口
-优先从以下入口中选一个，而不是默认“先介绍新闻背景”：
-- 一个反常细节
-- 一个数字
-- 一句官方措辞
-- 一个具体岗位/JD/产品/页面
-- 作者亲测中的一个瞬间
-- 一个真实人物或场景
-- 一个作者自己也曾误判的问题
+至少覆盖：
+- 一个从材料矛盾/异常点出发；
+- 一个从读者决策出发；
+- 一个允许更锋利、可能反对主流叙事的判断。
 
-写入 `author.entry_point`。
+## Step 3｜主动枪毙平庸角度
+先淘汰：
+1. 最像“发生了什么→为什么重要→普通人怎么办”的；
+2. 任何同类AI账号都能从公开材料直接推出的；
+3. decision_change 只能写成“多关注/多学习/提高认知”的；
+4. 需要靠夸大证据才能显得锋利的。
 
-如果没有足够具体的入口，标记 `author.voice_risk: high`，优先回 ResearchPack 补案例/细节，而不是靠文风硬救。
+写入 `author.rejected_pov_ids` 和淘汰理由。
 
-## Step 4｜个人材料与作者资产
-整理本篇可合法使用的作者材料：
-- first_hand_experience
-- field_observation
-- personal_judgment
-- test_result
-- calculation
-- analogy_from_other_domain
-- uncertainty
+最终只选择一个 `author.selected_pov_id` 进入 Architect。
 
-禁止编造任何第一人称经历。
+## Step 4｜Entry Point + Decision Change
+入口必须具体，并附：
+- `content`
+- `evidence_refs`
+- `decision_change`
 
-如果当前没有作者亲历，也可以保留“明确判断 + 独立选择 + 具体证据”形成作者性，但不得假装亲历。
+硬指标：
+> 如果这篇判断是对的，读者会具体改变哪个决定？
 
-## Step 5｜主动删东西
-研究包越丰富，越容易写成AI百科。
+空泛答案视为未通过。
 
-必须列出 `author.material_to_ignore`：
-- 哪些背景虽正确但不服务主线
-- 哪些数据不必写
-- 哪些标准答案式建议不写
-- 哪些“为了完整”才出现的段落应删除
+## Step 5｜Material Graveyard｜材料墓地
+ResearchPack 搜到的材料必须出现可审计的取舍。
 
-原则：宁可只说透一个判断，也不要把所有资料都写进去。
+不是把弃用材料重新写成长文，而是按“信息单元”计数：
 
-## Step 6｜Narrative Choice
-从内容本身选择一种最自然的叙事，不强制情绪模板：
-- single-thread：沿一个问题一路挖到底
-- scene-led：从具体场景展开
-- evidence-led：从一个证据/数字展开
-- argument-led：围绕一个明确判断推进
-- case-led：沿一个案例拆机制
-- diary-led：适合真实亲测/过程记录
-- compare-led：两件事并置产生理解
+```yaml
+material_graveyard:
+  - item_id: G001
+    refs: [C004, S006]
+    summary: ""
+    why_excluded: ""
+    weight: 2
+selection_stats:
+  retained_units: 5
+  discarded_units: 6
+```
 
-只选一个主结构。允许中途自然偏移，但禁止“每篇都反转”。
+Standard/Deep 默认要求：`discarded_units >= retained_units`。
 
-## Step 7｜Voice Profile
-读取 `../shared/voice-profiles.md` 对应账号。
+目的不是逼模型制造废话，而是保证至少有一半已研究材料被明确放弃，形成真实选择压力。
 
-输出本篇具体约束：
-- voice_traits：3–5个
-- preferred_moves：本篇可用的表达动作
-- banned_moves：本篇尤其要避免的套路
-- first_person_level：none | low | medium | high
-- looseness：tight | natural | conversational
+如果研究包本身太薄，回 ResearchPack，不要伪造墓地。
 
-## Step 8｜Humanity Test
-在进入 Architect 前检查：
-1. 去掉作者名，这篇是否任何AI账号都能写？
-2. 有没有至少一个具体选择，体现“作者决定讲什么、不讲什么”？
-3. 有没有一句明确判断，而不是只有中立总结？
-4. 有没有具体细节承载观点？
-5. 是否仍然像“发生了什么→为什么重要→怎么办”的标准回答？
+## Step 6｜真实不确定性绑定
+第一人称犹豫、保留判断、开放问题，只能引用 `research.uncertainty_nodes`。
 
-若第1或第5项答案明显为“是”，设置：
-`workflow.gate: rework`
-`workflow.return_to: author`
+```yaml
+uncertainty_usage:
+  - node_id: U001
+    intended_expression: explicit_uncertainty
+```
+
+没有 Uxxx 节点时，不得凭空写“我也不确定”“这里值得怀疑”等表演式犹豫。
+
+## Step 7｜Narrative Choice
+只选一个主结构：single-thread / scene-led / evidence-led / argument-led / case-led / diary-led / compare-led。
+
+结构服务 selected POV，不负责把所有材料装进去。
+
+## Step 8｜Voice Profile + Exemplars
+`voice-profiles.md` 只提供低权重边界。
+
+如果 `voice-samples/manifest.yaml` 对应账号存在用户确认的正例/反例，则优先读取具体样例：
+- 正例告诉模型“什么句子像”；
+- 反例告诉模型“什么句子虽正确但不像”。
+
+没有已确认样例时必须标记：`author.voice_calibration: uncalibrated`，不能把形容词画像冒充已校准声音。
+
+## Step 9｜Humanity / Depth Test
+进入 Architect 前检查：
+1. 3个候选是否真的竞争过？
+2. 最显然的角度是否被主动淘汰？
+3. selected POV 是否有具体 decision_change？
+4. material graveyard 是否达到选择压力？
+5. 读者能否说出“作者反对/提醒/坚持什么”？
+6. 是否有任何假犹豫或伪第一人称？
+
+未通过：`gate: rework`，优先回 author；材料不足则回 research/topic。
 
 ## 输出
-### Human Summary
-- 为什么写
-- 作者POV
-- 具体入口
-- 可用个人/原创材料
-- 主动删除的材料
-- Narrative Choice
-- 本篇声音约束
-- Humanity Test
+Human Summary：3个POV候选、各自平庸风险、淘汰过程、最终POV、具体入口、decision_change、材料墓地、真实不确定性、叙事选择、Voice Calibration状态。
 
-### State Patch
-写入：
-- `author.*`
-- 通过后：`workflow.stage: author, gate: ready`
+State Patch：`author.*`；通过后 `workflow.stage: author, gate: ready`。
 
 ## 禁止
-- 把“普通人该怎么办”自动当成作者观点
-- 用“我觉得”伪造作者性
-- 为了人味虚构经历、情绪或聊天
-- 强制制造反转
-- 为了完整把ResearchPack全部写进正文
+- 只生成一个 POV
+- 用“我觉得”代替作者性
+- 为了锋利制造没有证据约束的观点
+- 用假犹豫制造人味
+- 研究了很多材料却全部写进正文
+- 未经用户确认就把历史稿自动当作 Voice 正例
