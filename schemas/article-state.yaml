@@ -1,4 +1,4 @@
-version: "0.4"
+version: "0.5"
 article_id: ""
 account: ""
 created_at: ""
@@ -11,7 +11,7 @@ production:
   mode_reason: ""
 
 workflow:
-  stage: "signal" # signal | topic | research | architecture | writing | visual | qa | publishing | published | reviewed
+  stage: "signal" # signal | topic | research | author | architecture | writing | visual | qa | publishing | published | reviewed
   gate: "ready" # ready | blocked | rework | manual_review
   blocked_by: []
   return_to: ""
@@ -66,12 +66,35 @@ research:
     commodity_content_risk: "unknown" # low | medium | high | unknown
     missing_original_material: []
 
+author:
+  why_write: ""
+  pov: []
+  entry_point:
+    type: "" # detail | number | quote | job | product | scene | test | question | other
+    content: ""
+    evidence_refs: []
+  personal_material: []
+  material_to_ignore: []
+  narrative_choice: "" # single-thread | scene-led | evidence-led | argument-led | case-led | diary-led | compare-led
+  voice_profile: ""
+  voice_traits: []
+  preferred_moves: []
+  banned_moves: []
+  first_person_level: "low" # none | low | medium | high
+  looseness: "natural" # tight | natural | conversational
+  humanity_test:
+    generic_ai_risk: "unknown" # low | medium | high | unknown
+    template_risk: "unknown" # low | medium | high | unknown
+    author_specificity: "unknown" # high | medium | low | unknown
+    note: ""
+
 architecture:
   core_thesis: ""
   article_type: ""
   reader_task: ""
+  narrative_choice: ""
   structure: []
-  emotion_curve: []
+  optional_emotion_notes: []
   visual_nodes: []
 
 writing:
@@ -80,6 +103,10 @@ writing:
   sections: []
   body_status: "not_started" # not_started | draft | revised | final
   word_count: null
+  anti_template_pass:
+    status: "not_run" # not_run | pass | rework
+    detected_patterns: []
+    edits_made: []
   risk_notes: []
 
 visual:
@@ -94,6 +121,10 @@ qa:
   status: "not_run" # not_run | A | B | C
   blocking_issues: []
   recommended_fixes: []
+  voice_review:
+    author_presence: "unknown" # high | medium | low | unknown
+    template_risk: "unknown" # low | medium | high | unknown
+    voice_match: "unknown" # high | medium | low | unknown
 
 publishing:
   plan_status: "not_started" # not_started | planned | ready
