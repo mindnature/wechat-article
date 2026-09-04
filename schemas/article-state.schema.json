@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mindnature/wechat-article/schemas/article-state.schema.json",
+  "title": "WeChat ArticleState v0.4",
+  "type": "object",
+  "required": ["version", "article_id", "account", "production", "workflow", "signal", "topic", "research", "architecture", "writing", "visual", "qa", "publishing", "publication", "performance", "learning"],
+  "properties": {
+    "version": {"const": "0.4"},
+    "article_id": {"type": "string"},
+    "account": {"type": "string"},
+    "production": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": {"enum": ["flash", "standard", "deep"]},
+        "target_word_count": {"type": ["integer", "null"], "minimum": 0},
+        "deadline": {"type": "string"},
+        "mode_reason": {"type": "string"}
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "required": ["stage", "gate", "blocked_by", "return_to", "retry_count"],
+      "properties": {
+        "stage": {"enum": ["signal", "topic", "research", "architecture", "writing", "visual", "qa", "publishing", "published", "reviewed"]},
+        "gate": {"enum": ["ready", "blocked", "rework", "manual_review"]},
+        "blocked_by": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "return_to": {"type": "string"},
+        "retry_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "signal": {"type": "object"},
+    "topic": {"type": "object"},
+    "research": {
+      "type": "object",
+      "required": ["source_registry", "claims", "calculations", "originality_gate"],
+      "properties": {
+        "source_registry": {"type": "array", "items": {"$ref": "source.schema.json"}},
+        "claims": {"type": "array", "items": {"$ref": "claim.schema.json"}},
+        "calculations": {"type": "array", "items": {"type": "object"}},
+        "originality_gate": {"type": "object"}
+      }
+    },
+    "architecture": {"type": "object"},
+    "writing": {
+      "type": "object",
+      "required": ["title_candidates", "selected_title", "sections", "body_status"],
+      "properties": {
+        "title_candidates": {"type": "array"},
+        "selected_title": {"type": "string"},
+        "sections": {"type": "array"},
+        "body_status": {"enum": ["not_started", "draft", "revised", "final"]},
+        "word_count": {"type": ["integer", "null"], "minimum": 0},
+        "risk_notes": {"type": "array"}
+      }
+    },
+    "visual": {
+      "type": "object",
+      "required": ["planning_status", "execution_status", "assets_ready"],
+      "properties": {
+        "planning_status": {"enum": ["not_started", "planned", "complete"]},
+        "execution_status": {"enum": ["not_started", "partial", "complete", "unavailable"]},
+        "assets_ready": {"type": "boolean"},
+        "cover": {"type": "object"},
+        "inline_images": {"type": "array", "items": {"$ref": "visual-asset.schema.json"}},
+        "rights_risks": {"type": "array"}
+      }
+    },
+    "qa": {
+      "type": "object",
+      "properties": {
+        "status": {"enum": ["not_run", "A", "B", "C"]},
+        "blocking_issues": {"type": "array"},
+        "recommended_fixes": {"type": "array"}
+      }
+    },
+    "publishing": {"type": "object"},
+    "publication": {"type": "object"},
+    "performance": {"type": "object"},
+    "experiment": {"type": "object"},
+    "learning": {"type": "object"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"qa": {"properties": {"status": {"const": "A"}}}}},
+      "then": {
+        "properties": {
+          "visual": {"properties": {"assets_ready": {"const": true}}},
+          "workflow": {"properties": {"gate": {"const": "ready"}}}
+        }
+      }
+    }
+  ]
+}
