@@ -1,0 +1,169 @@
+version: "0.5"
+article_id: "fixture-invalid-generic-ai-voice"
+account: "思然知己"
+created_at: "2026-09-04T00:00:00+08:00"
+updated_at: "2026-09-04T00:00:00+08:00"
+production:
+  mode: standard
+  target_word_count: 1800
+  deadline: ""
+  mode_reason: "测试Author Gate"
+workflow:
+  stage: architecture
+  gate: ready
+  blocked_by: []
+  return_to: ""
+  retry_count: 0
+signal:
+  event: "示例AI职业事件"
+  event_date: "2026-09-04"
+  freshness: stable
+  scope: national
+  source_ids: [S001]
+  duplicate_check:
+    status: clear
+    related_article_ids: []
+    note: ""
+topic:
+  target_reader: "AI学习者"
+  core_angle: "职业变化"
+  core_conflict: "新任务与旧职业"
+  reader_value: "形成判断"
+  market_score: {demand: 4, urgency: 3, conflict: 2, information_gap: 4}
+  account_fit_score: {identity_match: 5, historical_fit: null, actionability: 4}
+  evidence_confidence: high
+  competition:
+    status: partial
+    level: medium
+    scanned_sources: []
+    sampled_competitors: []
+    crowded_angles: []
+    content_gap: ""
+  timing: now
+research:
+  source_registry:
+    - source_id: S001
+      title: "官方来源"
+      publisher: "示例机构"
+      url: "https://example.com"
+      published_at: "2026-09-04"
+      source_type: official
+      authority: A
+      notes: ""
+  claims:
+    - claim_id: C001
+      text: "已验证事实"
+      type: fact
+      scope: national
+      source_ids: [S001]
+      verification: verified
+      confidence: high
+      title_safe: true
+      note: ""
+  calculations: []
+  cases: []
+  controversy: []
+  limitations: []
+  originality_gate:
+    status: pass
+    assets:
+      - asset_id: O001
+        level: B
+        type: comparison
+        description: "独立对比"
+        evidence_refs: [C001]
+      - asset_id: O002
+        level: B
+        type: synthesis
+        description: "跨源综合"
+        evidence_refs: [C001]
+    score: 2
+    commodity_content_risk: medium
+    missing_original_material: []
+author:
+  why_write: ""
+  pov: []
+  entry_point:
+    type: detail
+    content: ""
+    evidence_refs: []
+  personal_material: []
+  material_to_ignore: []
+  narrative_choice: ""
+  voice_profile: ""
+  voice_traits: []
+  preferred_moves: []
+  banned_moves: []
+  first_person_level: low
+  looseness: natural
+  humanity_test:
+    generic_ai_risk: high
+    template_risk: high
+    author_specificity: low
+    note: "事实正确，但没有作者视角"
+architecture:
+  core_thesis: ""
+  article_type: "热点解释"
+  reader_task: ""
+  narrative_choice: ""
+  structure: []
+  optional_emotion_notes: []
+  visual_nodes: []
+writing:
+  title_candidates: []
+  selected_title: ""
+  sections: []
+  body_status: not_started
+  word_count: null
+  anti_template_pass:
+    status: not_run
+    detected_patterns: []
+    edits_made: []
+  risk_notes: []
+visual:
+  planning_status: not_started
+  execution_status: not_started
+  assets_ready: false
+  cover: {}
+  inline_images: []
+  rights_risks: []
+qa:
+  status: not_run
+  blocking_issues: []
+  recommended_fixes: []
+  voice_review:
+    author_presence: low
+    template_risk: high
+    voice_match: low
+publishing:
+  plan_status: not_started
+  final_title: ""
+  final_cover_asset_id: ""
+  summary: ""
+  publish_window: ""
+  urgency: normal
+  channel: wechat_official_account
+  distribution: []
+  followups: []
+  analytics_schedule: ["1h", "24h", "72h"]
+publication:
+  published_at: ""
+  channel: wechat_official_account
+  url: ""
+performance:
+  one_hour: {}
+  twenty_four_hour: {}
+  seventy_two_hour: {}
+  baseline_snapshot: {}
+experiment:
+  experiment_id: ""
+  hypothesis: ""
+  variable: ""
+  variant: ""
+  comparator: ""
+  primary_metric: ""
+  preregistered: false
+learning:
+  observations: []
+  hypotheses: []
+  promoted_rules: []
