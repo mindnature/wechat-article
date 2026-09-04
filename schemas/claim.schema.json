@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "claim.schema.json",
+  "title": "Evidence Claim",
+  "type": "object",
+  "required": ["claim_id", "text", "type", "scope", "source_ids", "verification", "confidence", "title_safe"],
+  "properties": {
+    "claim_id": {"type": "string", "pattern": "^C[0-9]{3,}$"},
+    "text": {"type": "string", "minLength": 1},
+    "type": {"enum": ["fact", "calculation", "inference", "opinion", "unknown"]},
+    "scope": {"enum": ["global", "national", "province", "city", "institution", "company", "single_case", "unknown"]},
+    "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "verification": {"enum": ["verified", "partial", "disputed", "unsupported", "false", "unknown"]},
+    "confidence": {"enum": ["high", "medium", "low", "unknown"]},
+    "title_safe": {"type": "boolean"},
+    "note": {"type": "string"}
+  }
+}

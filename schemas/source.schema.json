@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source.schema.json",
+  "title": "Research Source",
+  "type": "object",
+  "required": ["source_id", "title", "source_type", "authority"],
+  "properties": {
+    "source_id": {"type": "string", "pattern": "^S[0-9]{3,}$"},
+    "title": {"type": "string", "minLength": 1},
+    "publisher": {"type": "string"},
+    "url": {"type": "string"},
+    "published_at": {"type": "string"},
+    "source_type": {"enum": ["official", "primary", "academic", "company", "media", "social", "secondary"]},
+    "authority": {"enum": ["A", "B", "C", "D"]},
+    "notes": {"type": "string"}
+  }
+}

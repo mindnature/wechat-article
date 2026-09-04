@@ -1,0 +1,77 @@
+version: "0.4"
+article_id: "fixture-invalid-broken-evidence"
+account: "思然修远"
+created_at: ""
+updated_at: ""
+production:
+  mode: standard
+  target_word_count: 1800
+  deadline: ""
+  mode_reason: "故意失败"
+workflow:
+  stage: qa
+  gate: ready
+  blocked_by: []
+  return_to: ""
+  retry_count: 0
+signal: {}
+topic: {}
+research:
+  source_registry:
+    - source_id: S001
+      title: "来源"
+      publisher: "示例"
+      url: ""
+      published_at: ""
+      source_type: official
+      authority: A
+      notes: ""
+  claims:
+    - claim_id: C001
+      text: "存在的事实"
+      type: fact
+      scope: national
+      source_ids: [S001]
+      verification: verified
+      confidence: high
+      title_safe: true
+      note: ""
+  calculations: []
+  originality_gate:
+    status: fail
+    assets: []
+    score: 0
+    commodity_content_risk: high
+    missing_original_material: ["需要A级原创资产"]
+architecture: {}
+writing:
+  title_candidates: []
+  selected_title: "错误示例"
+  sections:
+    - section_id: W01
+      source_section_id: A01
+      text: "引用了不存在的证据。"
+      claim_ids: [C999]
+      calc_ids: []
+      case_ids: []
+      statement_types: [fact]
+  body_status: final
+  word_count: 1800
+  risk_notes: []
+visual:
+  planning_status: complete
+  execution_status: unavailable
+  assets_ready: false
+  cover: {}
+  inline_images: []
+  rights_risks: []
+qa:
+  status: A
+  blocking_issues: []
+  recommended_fixes: []
+publishing:
+  plan_status: not_started
+publication: {}
+performance: {}
+experiment: {}
+learning: {}

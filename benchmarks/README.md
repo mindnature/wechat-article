@@ -2,35 +2,40 @@
 
 `cases.yaml` 用于验证 Skill 修改是否真正变好，而不是只让提示词更长。
 
+## 当前版本
+v0.4 共 20 个固定案例。
+
 ## 运行原则
+- TopicHunter：重点 B001–B013、B019
+- ResearchPack：重点 B001/B003/B004/B006/B007/B009/B011/B014/B018/B019
+- ViralWriter / PublisherQA：重点 B001/B005/B014/B016/B017/B018
+- PublishingPlan：B020
+- GrowthReviewer：需真实后台数据；实验判断必须检查预登记
 
-每次修改以下模块之一后，至少跑与其相关的固定案例：
-- TopicHunter：B001–B013
-- ResearchPack：重点 B001/B003/B004/B006/B007/B009/B011/B014
-- PublisherQA：重点 B001/B005/B011/B014
-- GrowthReviewer：需使用真实后台数据案例，不能伪造
+## 不可退化项
+1. Scope 正确
+2. 假新闻/弱证据能阻断
+3. 重复选题能识别
+4. 计算保留假设和公式
+5. 个案不泛化趋势
+6. 不伪造亲测/一手经验
+7. 弱热点能说“不写”
+8. blocked/rework 状态完整
+9. planned 不等于 assets_ready
+10. 正文证据引用不能断链
+11. C级原创不能独立通过 Standard/Deep
+12. QA后必须先 PublishingPlan 再 published
 
-## 通过标准
+## 机器校验 fixtures
 
-优先检查“不可退化项”：
-1. 是否正确识别 Scope
-2. 是否拒绝假新闻/弱证据
-3. 是否识别重复选题
-4. 是否记录计算假设和公式
-5. 是否把单一个案与趋势分开
-6. 是否避免伪造亲测/一手经验
-7. 是否能在弱热点上说“不写”
-
-文案更好看但这些安全/质量条件退化，视为测试失败。
-
-## 记录建议
-
-后续可为每次重要版本建立：
-
-```text
-benchmarks/runs/YYYY-MM-DD-vX.Y.md
+```bash
+python scripts/validate_state.py benchmarks/fixtures/valid-standard.yaml
+python scripts/validate_state.py benchmarks/fixtures/invalid-broken-evidence.yaml
 ```
 
-记录每个 case 的：PASS/FAIL、失败原因、受影响 Skill、是否阻断合并。
+第一个必须 PASS；第二个必须 FAIL。
 
-v0.3 当前先提供固定测试集和人工/Agent回归协议；未来再增加自动化 runner。
+GitHub Actions 会自动执行上述检查。
+
+## LLM语义回归
+B001–B020 中包含的 `must_* / should_*` 仍需人工或未来 Eval Runner 对 Skill 输出做语义断言。JSON Schema/validator 负责结构与交叉引用，不替代内容判断。

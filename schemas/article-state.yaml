@@ -1,9 +1,21 @@
-version: "0.3"
+version: "0.4"
 article_id: ""
 account: ""
-status: "signal"
 created_at: ""
 updated_at: ""
+
+production:
+  mode: "standard" # flash | standard | deep
+  target_word_count: null
+  deadline: ""
+  mode_reason: ""
+
+workflow:
+  stage: "signal" # signal | topic | research | architecture | writing | visual | qa | publishing | published | reviewed
+  gate: "ready" # ready | blocked | rework | manual_review
+  blocked_by: []
+  return_to: ""
+  retry_count: 0
 
 signal:
   event: ""
@@ -22,19 +34,20 @@ topic:
   core_conflict: ""
   reader_value: ""
   market_score:
-    demand: null # 0-5
-    urgency: null # 0-5
-    conflict: null # 0-5
-    information_gap: null # 0-5
+    demand: null
+    urgency: null
+    conflict: null
+    information_gap: null
   account_fit_score:
-    identity_match: null # 0-5
-    historical_fit: null # 0-5, N/A before enough history
-    actionability: null # 0-5
+    identity_match: null
+    historical_fit: null
+    actionability: null
   evidence_confidence: "unknown" # high | medium | low | unknown
   competition:
     status: "unverified" # verified | partial | unverified
     level: "unknown" # low | medium | high | unknown
     scanned_sources: []
+    sampled_competitors: []
     crowded_angles: []
     content_gap: ""
   timing: "unknown" # now | soon | evergreen | late | unknown
@@ -48,7 +61,8 @@ research:
   limitations: []
   originality_gate:
     status: "unchecked" # pass | conditional | fail | unchecked
-    original_value: [] # calculation | test | interview | proprietary_experience | comparison | synthesis | dataset | screenshot | other
+    assets: []
+    score: null
     commodity_content_risk: "unknown" # low | medium | high | unknown
     missing_original_material: []
 
@@ -63,11 +77,15 @@ architecture:
 writing:
   title_candidates: []
   selected_title: ""
+  sections: []
   body_status: "not_started" # not_started | draft | revised | final
   word_count: null
   risk_notes: []
 
 visual:
+  planning_status: "not_started" # not_started | planned | complete
+  execution_status: "not_started" # not_started | partial | complete | unavailable
+  assets_ready: false
   cover: {}
   inline_images: []
   rights_risks: []
@@ -76,6 +94,18 @@ qa:
   status: "not_run" # not_run | A | B | C
   blocking_issues: []
   recommended_fixes: []
+
+publishing:
+  plan_status: "not_started" # not_started | planned | ready
+  final_title: ""
+  final_cover_asset_id: ""
+  summary: ""
+  publish_window: ""
+  urgency: "normal" # immediate | same_day | scheduled | evergreen | normal
+  channel: "wechat_official_account"
+  distribution: []
+  followups: []
+  analytics_schedule: ["1h", "24h", "72h"]
 
 publication:
   published_at: ""
@@ -87,6 +117,15 @@ performance:
   twenty_four_hour: {}
   seventy_two_hour: {}
   baseline_snapshot: {}
+
+experiment:
+  experiment_id: ""
+  hypothesis: ""
+  variable: ""
+  variant: ""
+  comparator: ""
+  primary_metric: ""
+  preregistered: false
 
 learning:
   observations: []

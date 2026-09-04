@@ -1,0 +1,31 @@
+name: validate-v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'schemas/**'
+      - 'scripts/**'
+      - 'benchmarks/fixtures/**'
+      - 'skills/**'
+      - 'docs/**'
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - name: Valid fixture must pass
+        run: python scripts/validate_state.py benchmarks/fixtures/valid-standard.yaml
+      - name: Invalid fixture must fail
+        shell: bash
+        run: |
+          if python scripts/validate_state.py benchmarks/fixtures/invalid-broken-evidence.yaml; then
+            echo 'Invalid fixture unexpectedly passed'
+            exit 1
+          fi

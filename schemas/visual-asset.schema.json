@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "visual-asset.schema.json",
+  "title": "Visual Asset",
+  "type": "object",
+  "required": ["asset_id", "function", "asset_type", "status"],
+  "properties": {
+    "asset_id": {"type": "string", "pattern": "^V[0-9]{3,}$"},
+    "function": {"enum": ["evidence", "explain", "story", "emotion", "rhythm"]},
+    "asset_type": {"enum": ["real_image", "screenshot", "chart", "generated_image", "infographic"]},
+    "status": {"enum": ["planned", "searching", "generated", "selected", "ready", "blocked"]},
+    "source_url": {"type": "string"},
+    "source_label": {"type": "string"},
+    "rights_status": {"enum": ["clear", "likely_quotable", "needs_confirmation", "avoid", "not_applicable"]},
+    "privacy_risk": {"enum": ["low", "medium", "high", "unknown"]},
+    "file_ref": {"type": "string"},
+    "notes": {"type": "string"}
+  }
+}

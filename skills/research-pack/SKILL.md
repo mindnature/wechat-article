@@ -1,174 +1,109 @@
 ---
 name: research-pack
-description: 为高潜公众号选题建立可核验研究包，形成来源注册表、Evidence Ledger、Calculation Ledger、Scope 与 Originality Gate。
-version: "0.3"
-reads: [signal, topic, account]
-writes: [research, topic.evidence_confidence, status]
+description: 为高潜选题建立可核验研究包，形成 Source Registry、Evidence Ledger、Calculation Ledger、Scope 与分级 Originality Gate。
+version: "0.4"
+reads: [signal, topic, account, production, workflow]
+writes: [research, topic.evidence_confidence, workflow]
+resources: [../../docs/ORIGINALITY-RUBRIC.md, ../../docs/PRODUCTION-MODES.md]
 ---
 
 # ResearchPack｜深度素材研究
 
+遵循 v0.4 ArticleState、JSON Schema 和 Skill Contract。
+
 ## 目标
-把一个高潜选题做实，形成可直接交给 ArticleArchitect 使用的研究包。重点不是搜得多，而是让每个关键主张可追溯、范围清楚、计算可复现，同时建立至少一种内容增量。
-
-遵循 `../../schemas/article-state.yaml` 与 `../../docs/SKILL-CONTRACT.md`。
-
-## 核心原则
-1. 一手来源优先于二手转述。
-2. 事实、计算、推断、观点必须分开。
-3. 标题、导语和核心结论中的事实必须进入 Evidence Ledger。
-4. 政策、规则、统计必须记录 Scope。
-5. 自行计算必须记录假设、公式和结果，不能只留下最终数字。
-6. 必须主动寻找反方证据、限制条件与失败案例。
-7. 标准/深度文章在进入写作前必须过 Originality Gate。
+把选题做实，让关键主张可追溯、范围清楚、计算可复现，并建立符合生产模式的原创增量。
 
 ## Step 1｜Source Registry
-为来源建立唯一 ID：
+为来源建立唯一 `Sxxx` ID，记录 publisher/url/date/type/authority。
 
-```yaml
-- source_id: S001
-  title: ""
-  publisher: ""
-  url: ""
-  published_at: ""
-  source_type: official | primary | academic | company | media | social | secondary
-  authority: A | B | C | D
-  notes: ""
-```
-
-建议：
-- A：官方原文、法律/政策、论文原文、财报、项目主页、原始数据库
-- B：权威媒体直接采访/高质量专业来源
+权威等级：
+- A：官方原文、论文原文、财报、项目主页、原始数据库
+- B：权威媒体直接采访/专业来源
 - C：普通媒体二手转述
-- D：社交帖子、搬运、自媒体未核验信息
+- D：社交帖子、搬运、未核验自媒体
 
-D 级不能单独支撑关键事实。
+D级不能单独支撑关键事实。
 
 ## Step 2｜Evidence Ledger
-所有可能进入文章的关键主张写入 `research.claims`：
-
-```yaml
-- claim_id: C001
-  text: ""
-  type: fact | calculation | inference | opinion | unknown
-  scope: global | national | province | city | institution | company | single_case | unknown
-  source_ids: [S001]
-  verification: verified | partial | disputed | unsupported | false | unknown
-  confidence: high | medium | low
-  title_safe: true | false
-  note: ""
-```
+所有标题、导语、核心结论候选事实写入 `research.claims`，必须通过 `claim.schema.json`。
 
 规则：
-- 地方规则不得标成 national。
-- 单个案例不得标成行业趋势。
-- `partial/disputed/unsupported` 原则上不得作为标题核心。
-- 推断可以写，但必须在正文中以判断语气呈现。
+- 地方规则不得 national
+- 单个案例不得行业泛化
+- partial/disputed/unsupported 原则上不得 title_safe
+- inference/opinion 必须显式区分
 
 ## Step 3｜Calculation Ledger
-房贷、收益率、成本、同比、增长、回收期等自行计算写入：
+房贷、收益率、成本、同比、回收期等必须记录：假设、公式、inputs、result、sensitivity、verification。
 
+检查单位、年/月口径、名义/实际利率、税费、百分比基数、四舍五入。
+
+## Step 4｜七层素材
+原始来源、关键事实、关键数字、时间线、人物/案例、舆论争议、反方与限制。
+
+## Step 5｜分级 Originality Gate
+读取 `ORIGINALITY-RUBRIC.md`。
+
+每个原创资产写：
 ```yaml
-- calc_id: K001
-  question: ""
-  assumptions: []
-  formula: ""
-  inputs: {}
-  result: ""
-  sensitivity: ""
-  verification: reproduced | checked | unchecked
+- asset_id: O001
+  level: A | B | C
+  type: calculation | test | interview | proprietary_experience | comparison | synthesis | dataset | screenshot | other
+  description: ""
+  evidence_refs: []
 ```
 
-必须检查：
-- 单位
-- 年/月口径
-- 名义/实际利率
-- 是否含税/手续费
-- 百分比基数
-- 四舍五入
+门槛：
+- Flash：允许 conditional；必须明确资讯属性
+- Standard：至少 1×A 或 2×B
+- Deep：至少 1×A + 1×B
 
-计算结果用于标题时，标题或正文首个解释段必须快速交代关键假设。
+普通截图、常规汇总、摘要属于 C，不能单独过门。
 
-## Step 4｜七层素材包
-1. 原始来源
-2. 关键事实
-3. 关键数字
-4. 时间线：此前—触发点—当前—下一步
-5. 人物/案例
-6. 舆论与争议
-7. 反方与限制
+绝不伪造亲测、采访、内部经验。
 
-社交平台观点只能代表讨论，不得当事实。
+## Step 6｜模式化研究深度
+### Flash
+优先锁定 3–5 条关键 Claim；可简化时间线/争议，但事实门不降。
 
-## Step 5｜Originality Gate
-判断文章相较普通新闻/公开资料，是否至少增加一种：
-- calculation：自主计算
-- test：亲测产品/功能
-- interview：访谈/小调查
-- proprietary_experience：作者职业经验
-- comparison：独立对比
-- synthesis：新框架/跨源综合
-- dataset：自行整理数据
-- screenshot：一手页面/实验结果截图
-- other
+### Standard
+完整 Evidence Ledger + 限制条件 + 原创资产。
 
-输出：
-- `status: pass | conditional | fail`
-- `original_value`
-- `commodity_content_risk: low | medium | high`
-- `missing_original_material`
+### Deep
+扩大竞争扫描与反证；A类原创资产必须进入核心论证，可增加实验/访谈/数据集。
 
-规则：
-- 热点快讯可在 conditional 下继续，但必须缩短、明确其资讯属性。
-- 标准/深度文若 `fail + high risk`，原则上退回补素材，不直接进入 ViralWriter。
-- 绝不伪造“作者亲测/采访/内部经验”。
+## Step 7｜可视化素材池
+记录可用真实图、截图页面、图表数据、生成解释图机会及权利风险。
 
-## Step 6｜可视化素材池
-同步记录：
-- 可引用官方/产品/媒体真实图
-- 推荐截图页面
-- 可做信息图的数据
-- 需要 AI 解释图的抽象概念
-- 每张真实图建议图源与权利风险
+## Step 8｜研究门
+通过：
+- 核心 Claim 可支撑
+- Scope 清楚
+- 关键数字可核验
+- Originality 达到对应模式要求或 Flash conditional
 
-## Step 7｜研究状态判断
-### researched
-关键主张可支撑，范围明确，核心数字可核验，Originality Gate pass/conditional。
+则：`workflow.stage: research, gate: ready`。
 
-### blocked
-出现任一：
-- 核心事实只有单一低质量来源
-- 关键数字冲突无法解释
-- 政策范围/主体不清
-- 源头无法追溯
-- 关键标题事实 unsupported/false
+阻断条件：源头不可追、关键数字冲突、Scope不清、关键标题事实 unsupported/false、Standard/Deep 原创门 fail。
 
-被 blocked 时不得装作研究完成。
+阻断时：
+```yaml
+workflow:
+  stage: research
+  gate: blocked
+  blocked_by: [C003]
+  return_to: research
+```
 
 ## 输出
-### Human Summary
-1. 研究结论摘要（≤300字）
-2. Source Registry
-3. Evidence Ledger
-4. Calculation Ledger
-5. 时间线
-6. 人物/案例
-7. 舆论与争议
-8. 反方与限制
-9. Originality Gate
-10. 可视化素材池
-11. 未解决证据缺口
-12. 可安全用于标题的事实
+Human Summary：研究摘要、Source Registry、Evidence Ledger、Calculation Ledger、原创资产、限制、可视化池、证据缺口、title_safe事实。
 
-### State Patch
-仅写：
-- `research.*`
-- `topic.evidence_confidence`
-- `status: researched` 或保留/标记 blocked
+State Patch：仅 `research.*`、`topic.evidence_confidence`、`workflow.*`。
 
 ## 禁止
-- 为凑素材引用低质量转载站
-- AI生成事实、数据、采访或网友评论
+- 为凑素材引用低质量转载
+- AI生成事实/采访/网友评论
 - 忽略冲突证据
-- 把“可能/讨论”改写成“已经/全面”
-- 只给数字不给假设和公式
+- 只给计算结果不给假设与公式
+- 用C级“截图/汇总”冒充深度原创
