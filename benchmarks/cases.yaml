@@ -1,4 +1,4 @@
-version: "0.6"
+version: "0.7"
 cases:
   - id: B001
     name: 40年房贷与35岁门槛
@@ -103,34 +103,57 @@ cases:
   - id: B026
     name: 第二显然角度
     input: 热点有很多公开资料，AuthorLens第一反应是“职业名称出现说明市场已经成熟”
-    expected:
-      tension_test_required: true
-      author_must_generate_three_povs: true
-      each_pov_requires_banality_self_critique: true
-      must_reject_most_replaceable_angle: true
+    expected: {tension_test_required: true, author_must_generate_three_povs: true, each_pov_requires_banality_self_critique: true, must_reject_most_replaceable_angle: true}
   - id: B027
     name: 没有独家料也没有强判断
     input: 只有公开政策和新闻，候选角度也只是常规解释
-    expected:
-      standard_should_not_pass_tension_gate: true
-      should_downgrade_to_flash_or_backup: true
+    expected: {standard_should_not_pass_tension_gate: true, should_downgrade_to_flash_or_backup: true}
   - id: B028
     name: 伪犹豫
     input: Evidence全部verified，但正文为了人味写“我也不确定这会不会发生”
-    expected:
-      must_require_uncertainty_node: true
-      unsupported_uncertainty_must_fail: true
+    expected: {must_require_uncertainty_node: true, unsupported_uncertainty_must_fail: true}
   - id: B029
     name: 同上下文自评
     input: 同一个模型在同一条生产上下文中写完文章后执行BlindReview并给自己pass
-    expected:
-      evaluator_independence: same_context
-      blind_review_must_not_pass: true
-      workflow_gate: manual_review
+    expected: {evaluator_independence: same_context, blind_review_must_not_pass: true, workflow_gate: manual_review}
   - id: B030
     name: Voice历史稿未标注
     input: Library中存在很多旧文章，但用户没有明确标注哪些“像我”、哪些“不像我”
+    expected: {voice_calibration: uncalibrated, must_not_auto_promote_history_to_gold_samples: true}
+  - id: B031
+    name: 核心观点埋在后半篇
+    input: 标题问高校老师哪些工作交给Agent，但前800字都在介绍GPT-6 benchmark，核心判断到中段才出现
     expected:
-      voice_calibration: uncalibrated
-      must_not_auto_promote_history_to_gold_samples: true
-      should_request_or_wait_for_user_labels_before_calibration: true
+      thesis_prominence_must_fail: true
+      first_screen_must_contain_directional_answer: true
+      must_return_to_writing_or_architecture: true
+  - id: B032
+    name: 标题问哪些正文不分类
+    input: 标题承诺“哪些工作可以交给Agent”，正文只泛谈Agent从回答问题变成完成工作流
+    expected:
+      promise_type: which
+      promise_delivery_must_fail: true
+      numbered_framework_required: true
+      qa_must_not_be_A: true
+  - id: B033
+    name: 错把1234当AI味
+    input: 一篇知识型文章用01/02/03/04清晰列出四类任务，但各节内容具体、节奏不均匀
+    expected:
+      macro_structure_should_pass: true
+      anti_template_must_not_fail_only_because_numbered: true
+      numbered_framework_is_positive_navigation: true
+  - id: B034
+    name: 只有抽象大类没有具体任务
+    input: 正文列出“文献研究、数据分析、科研管理、教学”四类，但没有搜索、去重、清洗、汇总等具体动作链
+    expected:
+      concrete_task_coverage: rework
+      qa_must_not_be_A: true
+      must_require_task_level_examples: true
+  - id: B035
+    name: 深但不可交付的POV
+    input: 三个POV中最哲学的观点新颖，但无法拆成清晰章节；另一个观点稍浅但能形成4个具体读者交付单元
+    expected:
+      pov_selection_must_consider_frameworkability: true
+      deepest_pov_must_not_auto_win: true
+      selected_pov_specificity_min: 3
+      selected_pov_frameworkability_min: 3

@@ -1,224 +1,180 @@
-version: "0.6"
+version: "0.7"
 article_id: "fixture-valid-standard"
-account: "思然修远"
+account: "思然日新"
 created_at: "2026-09-04T00:00:00+08:00"
 updated_at: "2026-09-04T00:00:00+08:00"
-production:
-  mode: standard
-  target_word_count: 1800
-  deadline: ""
-  mode_reason: "标准文章"
-workflow:
-  stage: qa
-  gate: ready
-  blocked_by: []
-  return_to: ""
-  retry_count: 0
+production: {mode: standard, target_word_count: 1800, deadline: "", mode_reason: "标准知识决策稿"}
+workflow: {stage: qa, gate: ready, blocked_by: [], return_to: "", retry_count: 0}
 signal:
-  event: "示例事件"
+  event: "示例Agent能力升级"
   event_date: "2026-09-04"
   freshness: stable
-  scope: national
+  scope: global
   source_ids: [S001]
   duplicate_check: {status: clear, related_article_ids: [], note: ""}
 topic:
-  target_reader: "30+读者"
-  core_angle: "示例角度"
-  core_conflict: "眼前现金流与长期成本冲突"
-  reader_value: "改变是否延长期限的决定"
+  target_reader: "高校老师"
+  core_angle: "按可验收、可撤回、责任可控重划Agent工作边界"
+  core_conflict: "Agent能连续执行更多工作，但责任不能一起外包"
+  reader_value: "决定哪些工作整段交给Agent"
   tension_test:
     status: pass
-    contradiction: "月供下降但总成本上升"
-    unresolved_question: "现金流改善是否值得长期成本"
-    decision_change: "决定是否把贷款期限拉长"
-    exclusive_material_path: "自主计算不同期限成本"
-    strong_judgment_candidate: "低月供不等于更便宜"
+    contradiction: "复杂任务未必不能交，关键在是否容易验收和撤回"
+    unresolved_question: "高校老师应该按什么标准重新分配人与Agent的工作"
+    decision_change: "把可快速验收、可撤回的执行型工作整段交给Agent"
+    exclusive_material_path: "高校科研与科研管理真实工作流拆解"
+    strong_judgment_candidate: "任务复杂度不是Agent委派的首要边界"
     note: ""
-  market_score: {demand: 3, urgency: 2, conflict: 3, information_gap: 4}
-  account_fit_score: {identity_match: 5, historical_fit: null, actionability: 4}
+  reader_promise:
+    promise_type: which
+    promise: "给出高校老师现在可重新交给Agent的4类工作和3条边界"
+    provisional_answer: "先交执行链，不交最终学术判断和责任"
+    delivery_shape: numbered_framework
+    delivery_preview:
+      - "01 文献研究的前处理链"
+      - "02 数据分析的工程执行链"
+      - "03 项目申报与科研管理的材料链"
+      - "04 教学准备的生产链"
+    status: pass
+  delivery_potential: high
+  market_score: {demand: 4, urgency: 4, conflict: 3, information_gap: 4}
+  account_fit_score: {identity_match: 5, historical_fit: null, actionability: 5}
   evidence_confidence: high
-  competition: {status: partial, level: medium, scanned_sources: [], sampled_competitors: [], crowded_angles: [], content_gap: "示例"}
+  competition: {status: partial, level: medium, scanned_sources: [], sampled_competitors: [], crowded_angles: [], content_gap: "少有按高校任务链重划边界"}
   timing: now
 research:
   source_registry:
-    - source_id: S001
-      title: "官方来源"
-      publisher: "示例机构"
-      url: "https://example.com/source"
-      published_at: "2026-09-04"
-      source_type: official
-      authority: A
-      notes: ""
+    - {source_id: S001, title: "官方能力说明", publisher: "示例机构", url: "https://example.com/source", published_at: "2026-09-04", source_type: official, authority: A, notes: ""}
   claims:
-    - claim_id: C001
-      text: "已核验事实"
-      type: fact
-      scope: national
-      source_ids: [S001]
-      verification: verified
-      confidence: high
-      title_safe: true
-      note: ""
+    - {claim_id: C001, text: "Agent可在电脑环境中连续执行多步任务", type: fact, scope: global, source_ids: [S001], verification: verified, confidence: high, title_safe: true, note: ""}
   calculations:
-    - calc_id: K001
-      question: "示例计算"
-      assumptions: ["假设A"]
-      formula: "1 + 1"
-      inputs: {a: 1, b: 1}
-      result: 2
-      sensitivity: "无"
-      verification: reproduced
+    - {calc_id: K001, question: "示例计算", assumptions: ["假设A"], formula: "1 + 1", inputs: {a: 1, b: 1}, result: 2, sensitivity: "无", verification: reproduced}
   uncertainty_nodes:
-    - node_id: U001
-      type: calculation_assumption
-      description: "结果依赖假设A"
-      evidence_refs: [K001]
-      what_is_known: "公式与输入已知"
-      what_is_unknown: "真实个体假设可能不同"
-      allowed_voice_effect: hedge
+    - {node_id: U001, type: scope_boundary, description: "真实工作可交付比例随软件环境变化", evidence_refs: [C001], what_is_known: "能力已提升", what_is_unknown: "各校系统兼容性不同", allowed_voice_effect: explicit_uncertainty}
   depth_material:
-    - material_id: D001
-      type: calculation
-      exclusive: true
-      refs: [K001]
-      note: "自主计算"
+    - {material_id: D001, type: proprietary_experience, exclusive: true, refs: [C001], note: "高校工作流拆解"}
   cases: []
   controversy: []
   limitations: []
   originality_gate:
     status: pass
     assets:
-      - asset_id: O001
-        level: A
-        type: calculation
-        description: "自主计算"
-        evidence_refs: [K001]
+      - {asset_id: O001, level: A, type: proprietary_experience, description: "高校工作流拆解", evidence_refs: [C001]}
     score: 3
     commodity_content_risk: low
     missing_original_material: []
 author:
-  why_write: "从一个具体数字切入，不完整复述背景。"
+  why_write: "老师真正关心的不是模型分数，而是哪些工作现在可以整段交出去。"
   pov_candidates:
     - pov_id: P01
-      thesis: "低月供不等于更低成本"
-      evidence_refs: [K001]
-      tension: "现金流与总成本"
-      decision_change: "决定是否拉长期限"
-      banality_self_critique: "仍可能只是常规算账，但有自主计算支撑"
-      replaceability: medium
-      risk: ""
-    - pov_id: P02
-      thesis: "年龄门槛比期限本身更值得关注"
+      thesis: "GPT-6让老师能把更多工作交给Agent"
       evidence_refs: [C001]
-      tension: "选择权随年龄收缩"
-      decision_change: "决定是否提前规划贷款"
-      banality_self_critique: "容易被写成普通政策提醒"
+      tension: "能力升级"
+      decision_change: "增加Agent使用"
+      banality_self_critique: "太像普通功能总结"
       replaceability: high
-      risk: ""
+      evaluation: {novelty: 2, reader_value: 3, specificity: 2, frameworkability: 3, evidence_strength: 4}
+      framework_preview: ["01 能力变化", "02 科研影响", "03 教学影响"]
+      risk: "浅"
+    - pov_id: P02
+      thesis: "AI从回答问题进入完成工作流"
+      evidence_refs: [C001]
+      tension: "会想与会做接起来"
+      decision_change: "从问答转向工作流委派"
+      banality_self_critique: "仍是Agent行业常见判断"
+      replaceability: medium
+      evaluation: {novelty: 3, reader_value: 4, specificity: 3, frameworkability: 4, evidence_strength: 4}
+      framework_preview: ["01 文献", "02 数据", "03 管理", "04 教学"]
+      risk: "仍偏技术趋势"
     - pov_id: P03
-      thesis: "期限本质上是在购买现金流空间"
-      evidence_refs: [K001]
-      tension: "用长期利息购买短期现金流"
-      decision_change: "比较现金流价值与利息成本"
-      banality_self_critique: "如果没有计算会变成抽象财务观点"
+      thesis: "高校老师不该按简单/复杂划Agent边界，而要按可验收、可撤回、责任可控划"
+      evidence_refs: [C001]
+      tension: "复杂执行任务可交，简单高责任判断也不该交"
+      decision_change: "按三条标准重做个人任务分工表"
+      banality_self_critique: "如果没有具体任务链会变成抽象原则"
       replaceability: low
-      risk: ""
+      evaluation: {novelty: 4, reader_value: 5, specificity: 5, frameworkability: 5, evidence_strength: 4}
+      framework_preview: ["01 文献前处理", "02 数据工程活", "03 科研管理材料活", "04 教学生产活"]
+      risk: "需要明确责任边界"
   rejected_pov_ids: [P01, P02]
   selected_pov_id: P03
-  pov: ["期限是在购买现金流空间"]
+  pov: ["按可验收、可撤回、责任可控重划Agent边界"]
+  provisional_core_answer: "高校老师现在可以把结果易验收、做错可撤回、最终责任仍由人承担的执行型工作整段交给Agent，而研究设计、评价和最终决策仍留在人手里。"
   entry_point:
-    type: number
-    content: "示例计算结果为2"
-    evidence_refs: [K001]
-    decision_change: "比较现金流价值与利息成本后再决定期限"
-  personal_material:
-    - type: calculation
-      ref: K001
+    type: task
+    content: "老师在浏览器、Word、Excel、Python和文件夹之间反复切换的执行链"
+    evidence_refs: [C001]
+    decision_change: "把这些可验收执行链从人工逐步操作改成Agent整段委派"
+  personal_material: []
   material_graveyard:
-    - item_id: G001
-      refs: [C001]
-      summary: "完整政策背景"
-      why_excluded: "不服务现金流主线"
-      weight: 2
-    - item_id: G002
-      refs: [S001]
-      summary: "机构历史背景"
-      why_excluded: "只是完整性信息"
-      weight: 2
-  selection_stats: {retained_units: 3, discarded_units: 4}
+    - {item_id: G001, refs: [S001], summary: "完整模型benchmark列表", why_excluded: "不直接服务高校工作边界", weight: 3}
+    - {item_id: G002, refs: [C001], summary: "通用消费者场景", why_excluded: "不服务高校教师读者", weight: 2}
+    - {item_id: G003, refs: [S001], summary: "模型价格与上下文长度", why_excluded: "不改变本文任务分工结论", weight: 2}
+  selection_stats: {retained_units: 5, discarded_units: 7}
   uncertainty_usage:
-    - node_id: U001
-      intended_expression: hedge
-  narrative_choice: evidence-led
-  voice_profile: "思然修远"
+    - {node_id: U001, intended_expression: explicit_uncertainty}
+  narrative_choice: argument-led
+  voice_profile: "思然日新"
   voice_calibration: uncalibrated
   voice_traits: []
   preferred_moves: []
   banned_moves: []
   first_person_level: low
   looseness: natural
-  humanity_test:
-    generic_ai_risk: low
-    template_risk: low
-    author_specificity: high
-    note: "三选一且有材料取舍"
+  humanity_test: {generic_ai_risk: low, template_risk: low, author_specificity: high, note: "观点具体且可交付"}
 architecture:
-  core_thesis: "期限是在购买现金流空间"
-  article_type: "决策算账型"
-  reader_task: "判断现金流价值是否值得额外成本"
-  narrative_choice: evidence-led
+  core_thesis: "按可验收、可撤回、责任可控重划Agent工作边界"
+  article_type: "高校工作流决策指南"
+  reader_task: "重做个人Agent委派清单"
+  narrative_choice: argument-led
+  reader_contract:
+    promise_type: which
+    promise: "给出4类可交工作和3条边界"
+    core_answer: "把易验收、可撤回、责任仍在人手里的执行型工作整段交给Agent"
+    answer_shape: numbered_framework
+    expected_units: 4
+    delivery_units:
+      - {unit_id: D01, label: "文献研究：交前处理链", answer: "把搜、下、整、比交给Agent", concrete_examples: ["搜索→下载→去重→提取研究问题/数据/方法→建Literature Matrix"], claim_ids: [C001], calc_ids: [], uncertainty_ids: []}
+      - {unit_id: D02, label: "数据分析：交工程执行链", answer: "把导入、清洗、报错修复和出图交给Agent", concrete_examples: ["导入→清洗→跑代码→看报错→重跑→出图→导出"], claim_ids: [C001], calc_ids: [], uncertainty_ids: [U001]}
+      - {unit_id: D03, label: "科研管理：交材料链", answer: "把跨Word/Excel/网页/文件夹的材料处理交给Agent", concrete_examples: ["读通知→提条件→建清单→核附件→汇总Excel→找缺项"], claim_ids: [C001], calc_ids: [], uncertainty_ids: []}
+      - {unit_id: D04, label: "教学准备：交生产链", answer: "把可复核的课件与练习生产交给Agent", concrete_examples: ["按大纲整理案例→生成练习→做PPT初稿→按反馈修改"], claim_ids: [C001], calc_ids: [], uncertainty_ids: []}
+  thesis_prominence: {required_in_first_screen: true, max_chars: 300, delayed_reason: ""}
+  first_screen_plan:
+    core_answer: "不按简单/复杂分，而按可验收、可撤回、责任可控分"
+    delivery_preview: "接下来给4类可交工作和3类不该交的判断"
+    credibility_anchor: "Agent电脑操作与科研执行能力升级"
   structure:
-    - section_id: A01
-      role: "从数字进入"
-      key_message: "示例计算"
-      claim_ids: [C001]
-      calc_ids: [K001]
-      case_ids: []
-      uncertainty_ids: [U001]
-      statement_types: [fact, calculation]
-      author_function: evidence
-      visual_node: "V001"
+    - {section_id: A01, delivery_unit_id: D01, role: "01", key_message: "文献前处理链", claim_ids: [C001], calc_ids: [], case_ids: [], uncertainty_ids: [], statement_types: [fact, opinion], visual_node: "V001"}
+    - {section_id: A02, delivery_unit_id: D02, role: "02", key_message: "数据工程链", claim_ids: [C001], calc_ids: [], case_ids: [], uncertainty_ids: [U001], statement_types: [fact, opinion], visual_node: ""}
+    - {section_id: A03, delivery_unit_id: D03, role: "03", key_message: "科研管理材料链", claim_ids: [C001], calc_ids: [], case_ids: [], uncertainty_ids: [], statement_types: [fact, opinion], visual_node: ""}
+    - {section_id: A04, delivery_unit_id: D04, role: "04", key_message: "教学生产链", claim_ids: [C001], calc_ids: [], case_ids: [], uncertainty_ids: [], statement_types: [fact, opinion], visual_node: ""}
   optional_emotion_notes: []
   visual_nodes: ["V001"]
 writing:
   title_candidates:
-    - text: "示例标题"
-      claim_ids: [C001]
-      calc_ids: [K001]
-      scope_note: "national"
-      risk: low
-  selected_title: "示例标题"
+    - {text: "GPT-6之后，高校老师这4类工作可以重新交给Agent", claim_ids: [C001], calc_ids: [], scope_note: "高校教师任务建议", risk: low}
+  selected_title: "GPT-6之后，高校老师这4类工作可以重新交给Agent"
   sections:
-    - section_id: W01
-      source_section_id: A01
-      text: "已核验事实。示例计算结果为2。"
-      claim_ids: [C001]
-      calc_ids: [K001]
-      case_ids: []
-      statement_types: [fact, calculation]
-    - section_id: W02
-      source_section_id: A01
-      text: "这笔差额应按个人现金流价值判断。"
-      claim_ids: []
-      calc_ids: [K001]
-      case_ids: []
-      statement_types: [opinion, calculation]
+    - {section_id: W01, source_section_id: A01, text: "GPT-6这一轮最值得高校老师重新做的，不是提示词，而是工作分工。以后不按简单复杂分：能快速验收、做错可撤回、责任仍在人手里的执行链，可以整段交给Agent。下面直接看4类。", claim_ids: [C001], calc_ids: [], case_ids: [], statement_types: [fact, opinion]}
+    - {section_id: W02, source_section_id: A01, text: "01｜文献研究：先把搜、下、整、比交出去。搜索、下载、去重、提取研究问题/数据/方法，再建Literature Matrix。", claim_ids: [C001], calc_ids: [], case_ids: [], statement_types: [fact, opinion]}
+    - {section_id: W03, source_section_id: A02, text: "02｜数据分析：把工程执行链交出去。导入、清洗、跑代码、看报错、重跑、出图和导出，都属于结果容易复核的工作。", claim_ids: [C001], calc_ids: [], case_ids: [], statement_types: [fact, opinion]}
+    - {section_id: W04, source_section_id: A03, text: "03｜科研管理：把材料链交出去。读通知、提条件、建清单、核附件、汇总Excel、找缺项。", claim_ids: [C001], calc_ids: [], case_ids: [], statement_types: [fact, opinion]}
+    - {section_id: W05, source_section_id: A04, text: "04｜教学准备：把生产链交出去。按大纲整理案例、生成练习、做PPT初稿，再由老师确认。", claim_ids: [C001], calc_ids: [], case_ids: [], statement_types: [fact, opinion]}
   body_status: final
   word_count: 1800
-  generation_trace:
-    strategy: isolated_segments
-    segment_count: 2
-    isolated_context: true
-    reorder_pass: true
-    note: "两个局部brief分开生成后重排"
-  anti_template_pass:
+  generation_trace: {strategy: isolated_segments, segment_count: 5, isolated_context: true, reorder_pass: true, note: "局部生成后把结论前移"}
+  clarity_pass:
     status: pass
-    detected_patterns: []
-    edits_made: ["删除不必要背景", "调换两段顺序"]
-  blind_review_packet:
-    ready: true
-    body_only: true
-    anonymous_reference_ids: []
+    first_screen_excerpt: "GPT-6这一轮最值得高校老师重新做的，不是提示词，而是工作分工。以后不按简单复杂分：能快速验收、做错可撤回、责任仍在人手里的执行链，可以整段交给Agent。下面直接看4类。"
+    thesis_in_first_screen: true
+    promise_delivery_status: pass
+    numbered_framework_used: true
+    missing_delivery_units: []
+    evidence_overload_first_screen: false
+    concrete_task_coverage: pass
+    edits_made: ["把核心结论前移到第一屏", "用4个信息型编号小标题交付", "把benchmark移到结论之后"]
+  anti_template_pass: {status: pass, detected_patterns: [], edits_made: ["保留宏观编号，打散微观句式"]}
+  blind_review_packet: {ready: true, body_only: true, anonymous_reference_ids: []}
   risk_notes: []
 blind_review:
   status: pass
@@ -226,46 +182,24 @@ blind_review:
   ai_likeness: low
   voice_consistency: unavailable
   findings: []
-  strongest_human_passages: ["这笔差额应按个人现金流价值判断。"]
+  strongest_human_passages: ["以后不按简单复杂分：能快速验收、做错可撤回、责任仍在人手里的执行链，可以整段交给Agent。"]
   reference_sample_ids: []
-  note: "无已校准Voice样例，做纯正文盲审"
+  note: "纯正文盲审"
 visual:
   planning_status: complete
   execution_status: complete
   assets_ready: true
   cover: {asset_id: V000, status: ready, file_ref: "cover.png"}
   inline_images:
-    - asset_id: V001
-      function: explain
-      asset_type: infographic
-      status: ready
-      source_url: ""
-      source_label: "作者整理"
-      rights_status: not_applicable
-      privacy_risk: low
-      file_ref: "img-01.png"
-      notes: ""
+    - {asset_id: V001, function: explain, asset_type: infographic, status: ready, source_url: "", source_label: "作者整理", rights_status: not_applicable, privacy_risk: low, file_ref: "img-01.png", notes: ""}
   rights_risks: []
 qa:
   status: A
   blocking_issues: []
   recommended_fixes: []
-  voice_review:
-    author_presence: high
-    template_risk: low
-    voice_match: unknown
-    blind_review_status: pass
-publishing:
-  plan_status: not_started
-  final_title: ""
-  final_cover_asset_id: ""
-  summary: ""
-  publish_window: ""
-  urgency: normal
-  channel: wechat_official_account
-  distribution: []
-  followups: []
-  analytics_schedule: ["1h", "24h", "72h"]
+  clarity_review: {thesis_prominence: pass, first_screen: pass, promise_delivery: pass, macro_structure: pass, concrete_delivery: pass}
+  voice_review: {author_presence: high, template_risk: low, voice_match: unknown, blind_review_status: pass}
+publishing: {plan_status: not_started, final_title: "", final_cover_asset_id: "", summary: "", publish_window: "", urgency: normal, channel: wechat_official_account, distribution: [], followups: [], analytics_schedule: ["1h", "24h", "72h"]}
 publication: {published_at: "", channel: wechat_official_account, url: ""}
 performance: {one_hour: {}, twenty_four_hour: {}, seventy_two_hour: {}, baseline_snapshot: {}}
 experiment: {experiment_id: "", hypothesis: "", variable: "", variant: "", comparator: "", primary_metric: "", preregistered: false}

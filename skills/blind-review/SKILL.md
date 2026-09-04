@@ -1,7 +1,7 @@
 ---
 name: blind-review
 description: 在不知道生产pipeline规则的独立上下文中，对成稿做匿名语感盲测，定位最像AI的段落与句子；同上下文自评不得通过。
-version: "0.6"
+version: "0.7"
 reads: [writing, account, workflow]
 writes: [blind_review, workflow]
 resources: [../shared/voice-samples/manifest.yaml, ../../docs/BLIND-REVIEW.md]

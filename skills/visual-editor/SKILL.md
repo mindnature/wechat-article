@@ -1,7 +1,7 @@
 ---
 name: visual-editor
 description: 在独立盲审通过后规划并执行公众号封面、真实图、AI图和信息图资产，显式管理就绪、图源、版权、真实性与叙事一致性。
-version: "0.6"
+version: "0.7"
 reads: [author, architecture, writing, blind_review, research, account, production, workflow]
 writes: [visual, workflow]
 ---

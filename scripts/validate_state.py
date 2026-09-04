@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate WeChat ArticleState v0.6 structure, depth gates, evidence lineage and blind-review independence."""
+"""Validate WeChat ArticleState v0.7: truth, depth, clarity, promise delivery and blind-review independence."""
 
 from __future__ import annotations
 
@@ -31,6 +31,8 @@ STAGE_ORDER = {
 }
 
 GENERIC_DECISION_PHRASES = ("多关注", "多学习", "提高认知", "持续关注", "保持关注")
+GENERIC_PROMISE_PHRASES = ("了解趋势", "了解变化", "提升认知", "了解更多", "看看发展")
+FRAMEWORK_PROMISE_TYPES = {"which", "how", "list"}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -74,8 +76,7 @@ def validate_cross_refs(state: dict[str, Any]) -> list[str]:
     uncertainty = research.get("uncertainty_nodes", []) or []
     writing = state.get("writing", {})
     sections = writing.get("sections", []) or []
-    visual = state.get("visual", {})
-    assets = visual.get("inline_images", []) or []
+    assets = state.get("visual", {}).get("inline_images", []) or []
 
     source_ids, e = unique_ids(sources, "source_id", "source_id")
     errors.extend(e)
@@ -133,6 +134,13 @@ def validate_workflow(state: dict[str, Any]) -> list[str]:
             errors.append("qa.status=A requires no blocking_issues")
         if gate != "ready":
             errors.append("qa.status=A requires workflow.gate=ready")
+        clarity = state.get("writing", {}).get("clarity_pass", {}) or {}
+        if clarity.get("status") != "pass":
+            errors.append("qa.status=A requires writing.clarity_pass.status=pass")
+        if clarity.get("promise_delivery_status") != "pass":
+            errors.append("qa.status=A requires promise_delivery_status=pass")
+        if clarity.get("concrete_task_coverage") != "pass":
+            errors.append("qa.status=A requires concrete_task_coverage=pass")
         if state.get("writing", {}).get("anti_template_pass", {}).get("status") != "pass":
             errors.append("qa.status=A requires writing.anti_template_pass.status=pass")
 
@@ -142,11 +150,8 @@ def validate_workflow(state: dict[str, Any]) -> list[str]:
         if publishing.get("plan_status") not in {"planned", "ready"}:
             errors.append(f"workflow.stage={stage} requires publishing.plan_status planned/ready")
 
-    if stage in {"published", "reviewed"}:
-        publication = state.get("publication", {})
-        if not publication.get("published_at"):
-            errors.append(f"workflow.stage={stage} requires publication.published_at")
-
+    if stage in {"published", "reviewed"} and not state.get("publication", {}).get("published_at"):
+        errors.append(f"workflow.stage={stage} requires publication.published_at")
     return errors
 
 
@@ -160,15 +165,43 @@ def validate_tension(state: dict[str, Any]) -> list[str]:
     tension = state.get("topic", {}).get("tension_test", {}) or {}
     if tension.get("status") != "pass":
         errors.append("standard/deep research requires topic.tension_test.status=pass")
-    if not (tension.get("contradiction", "").strip() or tension.get("unresolved_question", "").strip()):
+    if not (str(tension.get("contradiction", "")).strip() or str(tension.get("unresolved_question", "")).strip()):
         errors.append("tension test requires contradiction or unresolved_question")
-    decision = tension.get("decision_change", "").strip()
+    decision = str(tension.get("decision_change", "")).strip()
     if not decision:
         errors.append("tension test requires concrete decision_change")
     if any(p in decision for p in GENERIC_DECISION_PHRASES):
         errors.append("tension decision_change is too generic")
-    if not (tension.get("exclusive_material_path", "").strip() or tension.get("strong_judgment_candidate", "").strip()):
+    if not (str(tension.get("exclusive_material_path", "")).strip() or str(tension.get("strong_judgment_candidate", "")).strip()):
         errors.append("standard/deep tension requires exclusive material path or strong judgment candidate")
+    return errors
+
+
+def validate_reader_promise(state: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    mode = state.get("production", {}).get("mode")
+    stage = state.get("workflow", {}).get("stage")
+    if mode == "flash" or stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["research"]:
+        return errors
+
+    topic = state.get("topic", {}) or {}
+    promise = topic.get("reader_promise", {}) or {}
+    if promise.get("status") != "pass":
+        errors.append("standard/deep requires topic.reader_promise.status=pass")
+    ptext = str(promise.get("promise", "")).strip()
+    answer = str(promise.get("provisional_answer", "")).strip()
+    if not ptext:
+        errors.append("reader promise must state what the reader gets")
+    if any(p in ptext for p in GENERIC_PROMISE_PHRASES):
+        errors.append("reader promise is too generic")
+    if not answer:
+        errors.append("reader promise requires provisional_answer")
+    ptype = promise.get("promise_type")
+    preview = promise.get("delivery_preview", []) or []
+    if ptype in FRAMEWORK_PROMISE_TYPES and len(preview) < 3:
+        errors.append(f"promise_type={ptype} requires at least 3 delivery preview units")
+    if topic.get("delivery_potential") == "low":
+        errors.append("standard/deep cannot proceed with delivery_potential=low")
     return errors
 
 
@@ -178,11 +211,9 @@ def validate_originality(state: dict[str, Any]) -> list[str]:
     stage = state.get("workflow", {}).get("stage")
     if stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["writing"]:
         return errors
-
     assets = state.get("research", {}).get("originality_gate", {}).get("assets", []) or []
     a_count = sum(1 for a in assets if a.get("level") == "A")
     b_count = sum(1 for a in assets if a.get("level") == "B")
-
     if mode == "standard" and not (a_count >= 1 or b_count >= 2):
         errors.append("standard mode requires >=1 A originality asset or >=2 B assets before writing")
     if mode == "deep" and not (a_count >= 1 and b_count >= 1):
@@ -197,11 +228,10 @@ def validate_author_depth(state: dict[str, Any]) -> list[str]:
     if mode == "flash" or stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["architecture"]:
         return errors
 
-    author = state.get("author", {})
+    author = state.get("author", {}) or {}
     candidates = author.get("pov_candidates", []) or []
     if len(candidates) != 3:
         errors.append("standard/deep AuthorLens requires exactly 3 POV candidates")
-
     pov_ids = {c.get("pov_id") for c in candidates if c.get("pov_id")}
     selected = author.get("selected_pov_id")
     if not selected or selected not in pov_ids:
@@ -216,6 +246,25 @@ def validate_author_depth(state: dict[str, Any]) -> list[str]:
             errors.append(f"POV {pid} missing banality_self_critique")
         if not str(c.get("decision_change", "")).strip():
             errors.append(f"POV {pid} missing decision_change")
+        evaluation = c.get("evaluation", {}) or {}
+        for key in ("novelty", "reader_value", "specificity", "frameworkability", "evidence_strength"):
+            value = evaluation.get(key)
+            if not isinstance(value, int) or not 1 <= value <= 5:
+                errors.append(f"POV {pid} missing valid evaluation.{key} 1-5")
+        if len(c.get("framework_preview", []) or []) < 3:
+            errors.append(f"POV {pid} requires at least 3 framework_preview units")
+
+    selected_obj = next((c for c in candidates if c.get("pov_id") == selected), {})
+    selected_eval = selected_obj.get("evaluation", {}) or {}
+    for key in ("reader_value", "specificity", "frameworkability", "evidence_strength"):
+        if isinstance(selected_eval.get(key), int) and selected_eval.get(key) < 3:
+            errors.append(f"selected POV {key} must be >=3")
+
+    core_answer = str(author.get("provisional_core_answer", "")).strip()
+    if not core_answer:
+        errors.append("author.provisional_core_answer is required")
+    if len(core_answer) < 12:
+        errors.append("author.provisional_core_answer is too thin")
 
     entry = author.get("entry_point", {}) or {}
     decision = str(entry.get("decision_change", "")).strip()
@@ -241,7 +290,55 @@ def validate_author_depth(state: dict[str, Any]) -> list[str]:
         errors.append("author humanity test: template_risk is high")
     if humanity.get("author_specificity") == "low":
         errors.append("author humanity test: author_specificity is low")
+    return errors
 
+
+def validate_architecture_clarity(state: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    mode = state.get("production", {}).get("mode")
+    stage = state.get("workflow", {}).get("stage")
+    if mode == "flash" or stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["writing"]:
+        return errors
+
+    architecture = state.get("architecture", {}) or {}
+    contract = architecture.get("reader_contract", {}) or {}
+    topic_promise = state.get("topic", {}).get("reader_promise", {}) or {}
+    if contract.get("promise_type") != topic_promise.get("promise_type"):
+        errors.append("architecture reader_contract promise_type must match topic.reader_promise")
+    if not str(contract.get("promise", "")).strip():
+        errors.append("architecture.reader_contract.promise is required")
+    if not str(contract.get("core_answer", "")).strip():
+        errors.append("architecture.reader_contract.core_answer is required")
+
+    units = contract.get("delivery_units", []) or []
+    expected = int(contract.get("expected_units", 0) or 0)
+    if expected != len(units):
+        errors.append("reader_contract.expected_units must equal delivery_units count")
+    if contract.get("promise_type") in FRAMEWORK_PROMISE_TYPES and len(units) < 3:
+        errors.append("which/how/list reader contract requires at least 3 delivery units")
+    if contract.get("promise_type") in FRAMEWORK_PROMISE_TYPES and contract.get("answer_shape") != "numbered_framework":
+        errors.append("which/how/list promise defaults to answer_shape=numbered_framework")
+
+    unit_ids = set()
+    for unit in units:
+        uid = unit.get("unit_id")
+        if not uid:
+            errors.append("delivery unit missing unit_id")
+        elif uid in unit_ids:
+            errors.append(f"duplicate delivery unit_id: {uid}")
+        unit_ids.add(uid)
+        if not str(unit.get("label", "")).strip():
+            errors.append(f"delivery unit {uid or '?'} missing label")
+        if not str(unit.get("answer", "")).strip():
+            errors.append(f"delivery unit {uid or '?'} missing answer")
+        if not (unit.get("concrete_examples", []) or []):
+            errors.append(f"delivery unit {uid or '?'} requires concrete_examples")
+
+    prominence = architecture.get("thesis_prominence", {}) or {}
+    if prominence.get("required_in_first_screen") is False and not str(prominence.get("delayed_reason", "")).strip():
+        errors.append("delayed thesis requires architecture.thesis_prominence.delayed_reason")
+    if prominence.get("required_in_first_screen") is True and int(prominence.get("max_chars", 9999) or 9999) > 300:
+        errors.append("default thesis first-screen max_chars must be <=300")
     return errors
 
 
@@ -260,6 +357,28 @@ def validate_writing_generation(state: dict[str, Any]) -> list[str]:
     if trace.get("reorder_pass") is not True:
         errors.append("standard/deep writing requires reorder/delete pass")
 
+    clarity = state.get("writing", {}).get("clarity_pass", {}) or {}
+    if clarity.get("status") != "pass":
+        errors.append("standard/deep writing requires clarity_pass.status=pass")
+    excerpt = str(clarity.get("first_screen_excerpt", "")).strip()
+    if not excerpt:
+        errors.append("clarity pass requires first_screen_excerpt")
+    prominence = state.get("architecture", {}).get("thesis_prominence", {}) or {}
+    if prominence.get("required_in_first_screen") is True and clarity.get("thesis_in_first_screen") is not True:
+        errors.append("thesis must appear in first screen")
+    if clarity.get("promise_delivery_status") != "pass":
+        errors.append("promise_delivery_status must pass before blind review")
+    if clarity.get("missing_delivery_units"):
+        errors.append("clarity pass has missing_delivery_units")
+    if clarity.get("concrete_task_coverage") != "pass":
+        errors.append("concrete_task_coverage must pass before blind review")
+    if clarity.get("evidence_overload_first_screen") is True:
+        errors.append("first screen is overloaded by supporting evidence")
+
+    ptype = state.get("architecture", {}).get("reader_contract", {}).get("promise_type")
+    if ptype in FRAMEWORK_PROMISE_TYPES and clarity.get("numbered_framework_used") is not True:
+        errors.append(f"promise_type={ptype} requires numbered framework in writing")
+
     packet = state.get("writing", {}).get("blind_review_packet", {}) or {}
     if packet.get("ready") is not True or packet.get("body_only") is not True:
         errors.append("blind review packet must be ready and body_only")
@@ -272,7 +391,6 @@ def validate_blind_review(state: dict[str, Any]) -> list[str]:
     stage = state.get("workflow", {}).get("stage")
     if mode == "flash" or stage not in STAGE_ORDER or STAGE_ORDER[stage] < STAGE_ORDER["visual"]:
         return errors
-
     review = state.get("blind_review", {}) or {}
     if review.get("status") != "pass":
         errors.append("standard/deep visual stage requires blind_review.status=pass")
@@ -303,8 +421,10 @@ def validate(path: Path) -> list[str]:
     errors.extend(validate_cross_refs(state))
     errors.extend(validate_workflow(state))
     errors.extend(validate_tension(state))
+    errors.extend(validate_reader_promise(state))
     errors.extend(validate_originality(state))
     errors.extend(validate_author_depth(state))
+    errors.extend(validate_architecture_clarity(state))
     errors.extend(validate_writing_generation(state))
     errors.extend(validate_blind_review(state))
     errors.extend(validate_calculations(state))

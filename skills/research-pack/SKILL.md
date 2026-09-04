@@ -1,7 +1,7 @@
 ---
 name: research-pack
 description: 为高潜选题建立可核验研究包，形成 Source Registry、Evidence/Calculation/Uncertainty Ledger、Scope 与分级 Originality Gate。
-version: "0.6"
+version: "0.7"
 reads: [signal, topic, account, production, workflow]
 writes: [research, topic.evidence_confidence, workflow]
 resources: [../../docs/ORIGINALITY-RUBRIC.md, ../../docs/PRODUCTION-MODES.md]
@@ -9,7 +9,7 @@ resources: [../../docs/ORIGINALITY-RUBRIC.md, ../../docs/PRODUCTION-MODES.md]
 
 # ResearchPack｜深度素材研究
 
-遵循 v0.6 ArticleState、JSON Schema 和 Skill Contract。
+遵循 v0.7 ArticleState、JSON Schema 和 Skill Contract。
 
 ## 目标
 把选题做实，同时为“深主旨”提供真实摩擦：独家材料、冲突信源、数据缺口、主观假设或可被反驳的证据边界。

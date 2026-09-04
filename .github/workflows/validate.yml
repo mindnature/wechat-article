@@ -1,4 +1,4 @@
-name: validate-v0.6
+name: validate-v0.7
 
 on:
   pull_request:
@@ -22,75 +22,130 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
 
-      - name: Valid v0.6 Standard fixture must pass
+      - name: Valid v0.7 Standard fixture must pass
         run: python scripts/validate_state.py benchmarks/fixtures/valid-standard.yaml
 
-      - name: Broken evidence fixture must fail
+      - name: Broken evidence reference must fail
         shell: bash
         run: |
-          if python scripts/validate_state.py benchmarks/fixtures/invalid-broken-evidence.yaml; then
-            echo 'Broken evidence fixture unexpectedly passed'
-            exit 1
-          fi
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          d['writing']['sections'][1]['claim_ids']=['C999']
+          yaml.safe_dump(d,open('/tmp/broken-evidence.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/broken-evidence.yaml; then exit 1; fi
 
       - name: One-shot shallow POV must fail
         shell: bash
         run: |
           python - <<'PY'
           import yaml
-          p='benchmarks/fixtures/valid-standard.yaml'
-          d=yaml.safe_load(open(p,encoding='utf-8'))
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
           d['author']['pov_candidates']=d['author']['pov_candidates'][:1]
           d['author']['rejected_pov_ids']=[]
           d['author']['selected_pov_id']='P01'
           yaml.safe_dump(d,open('/tmp/shallow.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
           PY
-          if python scripts/validate_state.py /tmp/shallow.yaml; then
-            echo 'Shallow one-POV fixture unexpectedly passed'
-            exit 1
-          fi
+          if python scripts/validate_state.py /tmp/shallow.yaml; then exit 1; fi
 
-      - name: Generic decision change must fail tension gate
+      - name: Generic decision change must fail
         shell: bash
         run: |
           python - <<'PY'
           import yaml
-          p='benchmarks/fixtures/valid-standard.yaml'
-          d=yaml.safe_load(open(p,encoding='utf-8'))
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
           d['topic']['tension_test']['decision_change']='多关注AI变化'
           yaml.safe_dump(d,open('/tmp/generic-decision.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
           PY
-          if python scripts/validate_state.py /tmp/generic-decision.yaml; then
-            echo 'Generic decision-change fixture unexpectedly passed'
-            exit 1
-          fi
+          if python scripts/validate_state.py /tmp/generic-decision.yaml; then exit 1; fi
+
+      - name: Generic reader promise must fail
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          d['topic']['reader_promise']['promise']='了解趋势'
+          yaml.safe_dump(d,open('/tmp/generic-promise.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/generic-promise.yaml; then exit 1; fi
+
+      - name: Selected POV with low frameworkability must fail
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          for p in d['author']['pov_candidates']:
+            if p['pov_id']==d['author']['selected_pov_id']:
+              p['evaluation']['frameworkability']=2
+          yaml.safe_dump(d,open('/tmp/low-framework.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/low-framework.yaml; then exit 1; fi
+
+      - name: Missing concrete delivery must fail
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          d['architecture']['reader_contract']['delivery_units'][0]['concrete_examples']=[]
+          yaml.safe_dump(d,open('/tmp/no-concrete.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/no-concrete.yaml; then exit 1; fi
+
+      - name: Which promise without numbered framework must fail
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          d['writing']['clarity_pass']['numbered_framework_used']=False
+          yaml.safe_dump(d,open('/tmp/no-framework.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/no-framework.yaml; then exit 1; fi
+
+      - name: Buried thesis must fail first-screen gate
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          d['writing']['clarity_pass']['thesis_in_first_screen']=False
+          yaml.safe_dump(d,open('/tmp/buried-thesis.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/buried-thesis.yaml; then exit 1; fi
+
+      - name: Evidence-overloaded first screen must fail
+        shell: bash
+        run: |
+          python - <<'PY'
+          import yaml
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
+          d['writing']['clarity_pass']['evidence_overload_first_screen']=True
+          yaml.safe_dump(d,open('/tmp/evidence-overload.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
+          PY
+          if python scripts/validate_state.py /tmp/evidence-overload.yaml; then exit 1; fi
 
       - name: Same-context blind review must fail
         shell: bash
         run: |
           python - <<'PY'
           import yaml
-          p='benchmarks/fixtures/valid-standard.yaml'
-          d=yaml.safe_load(open(p,encoding='utf-8'))
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
           d['blind_review']['evaluator_independence']='same_context'
           yaml.safe_dump(d,open('/tmp/same-context.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
           PY
-          if python scripts/validate_state.py /tmp/same-context.yaml; then
-            echo 'Same-context blind review unexpectedly passed'
-            exit 1
-          fi
+          if python scripts/validate_state.py /tmp/same-context.yaml; then exit 1; fi
 
       - name: Fake uncertainty reference must fail
         shell: bash
         run: |
           python - <<'PY'
           import yaml
-          p='benchmarks/fixtures/valid-standard.yaml'
-          d=yaml.safe_load(open(p,encoding='utf-8'))
+          d=yaml.safe_load(open('benchmarks/fixtures/valid-standard.yaml',encoding='utf-8'))
           d['author']['uncertainty_usage'][0]['node_id']='U999'
           yaml.safe_dump(d,open('/tmp/fake-uncertainty.yaml','w',encoding='utf-8'),allow_unicode=True,sort_keys=False)
           PY
-          if python scripts/validate_state.py /tmp/fake-uncertainty.yaml; then
-            echo 'Fake uncertainty reference unexpectedly passed'
-            exit 1
-          fi
+          if python scripts/validate_state.py /tmp/fake-uncertainty.yaml; then exit 1; fi
