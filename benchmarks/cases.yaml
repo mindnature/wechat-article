@@ -1,4 +1,4 @@
-version: "0.3"
+version: "0.4"
 cases:
   - id: B001
     name: 40年房贷与35岁门槛
@@ -83,7 +83,7 @@ cases:
     name: 假新闻
     input: 只有自媒体转载、找不到源头的重大政策变化
     expected:
-      research_status: blocked
+      workflow_gate: blocked
       qa_status: C
       must_not_publish_as_fact: true
 
@@ -108,3 +108,51 @@ cases:
       must_record_assumptions: true
       must_record_formula: true
       must_not_title_result_without_assumptions: true
+
+  - id: B015
+    name: 状态机阻断
+    input: ResearchPack发现核心事实无法核验
+    expected:
+      workflow_stage: research
+      workflow_gate: blocked
+      must_have_blocked_by: true
+      must_have_return_to: true
+
+  - id: B016
+    name: 视觉只规划未执行
+    input: VisualEditor已经给出封面和插图计划，但没有真正获得任何图片文件
+    expected:
+      assets_ready: false
+      qa_must_not_be_A: true
+      must_return_to_visual: true
+
+  - id: B017
+    name: 正文证据链断裂
+    input: 正文W03引用C009，但Evidence Ledger不存在C009
+    expected:
+      validator_must_fail: true
+      qa_must_block: true
+
+  - id: B018
+    name: 原创门槛伪通过
+    input: Standard文章只有公开网页截图和普通多源摘要
+    expected:
+      originality_gate: fail
+      c_assets_cannot_pass: true
+      must_not_enter_final_writing: true
+
+  - id: B019
+    name: Flash与Deep模式
+    input: 同一热点分别以抢时效快讯与深度调查方式生产
+    expected:
+      flash_may_skip_full_architect: true
+      evidence_gate_same_across_modes: true
+      deep_requires_A_and_B_originality: true
+
+  - id: B020
+    name: QA后发布计划
+    input: 一篇文章QA=A且视觉资产全部ready
+    expected:
+      must_enter_publishing_plan_before_published: true
+      must_set_final_title_and_cover: true
+      must_schedule_analytics: true
