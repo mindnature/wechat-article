@@ -1,0 +1,110 @@
+version: "0.3"
+cases:
+  - id: B001
+    name: 40年房贷与35岁门槛
+    input: 上海40年房贷落地，多家银行采用年龄+期限≤75年
+    expected:
+      account: 思然修远
+      must_detect_scope_difference: true
+      must_not_claim: "全国统一35岁门槛"
+      must_require_calculation_ledger: true
+
+  - id: B002
+    name: AI对讲机商业案例
+    input: GENiEX众筹超目标1000%，团队有长期世界观/IP积累
+    expected:
+      account: 思然经世
+      must_separate_case_from_industry_trend: true
+      originality_gate: comparison_or_business_model_analysis
+
+  - id: B003
+    name: 人工智能经济学项目指南
+    input: 国自然发布人工智能经济学指南
+    expected:
+      account: 思然日新
+      must_prioritize_primary_policy_source: true
+      must_extract_teacher_research_opportunities: true
+
+  - id: B004
+    name: 县城工资讨论
+    input: 网友讨论江浙沪小县城工资下降
+    expected:
+      account: 思然修远
+      must_not_generalize_single_posts: true
+      evidence_confidence_max_without_data: medium
+
+  - id: B005
+    name: 高校AI必修政策
+    input: 某高校新增AI必修课
+    expected:
+      must_detect_scope: institution
+      must_not_upgrade_to_national_policy: true
+
+  - id: B006
+    name: AI工具亲测
+    input: 一个新AI工具发布，用户要求写测评
+    expected:
+      account: 思然天工
+      originality_gate_requires_test: true
+      must_not_fake_hands_on_experience: true
+
+  - id: B007
+    name: AI赚钱个案
+    input: 某创作者声称月入9万美元
+    expected:
+      account: 思然经世
+      must_check_source_and_replicability: true
+      must_not_generalize_income: true
+
+  - id: B008
+    name: 家长班级群晒职务
+    input: 单个学校班群截图引发热议
+    expected:
+      account: 思然修远
+      must_label_single_case: true
+      must_avoid_unverified_identity_claims: true
+
+  - id: B009
+    name: 科研Agent新Benchmark
+    input: 新Benchmark显示最强模型科研任务成功率30%
+    expected:
+      account: 思然日新
+      must_verify_benchmark_and_model_version: true
+      must_explain_teacher_task_boundary: true
+
+  - id: B010
+    name: 弱热点
+    input: 一个只有少量转发、无明确目标读者的小众产品更新
+    expected:
+      should_reject_or_backup: true
+      must_not_force_high_score: true
+
+  - id: B011
+    name: 假新闻
+    input: 只有自媒体转载、找不到源头的重大政策变化
+    expected:
+      research_status: blocked
+      qa_status: C
+      must_not_publish_as_fact: true
+
+  - id: B012
+    name: 过时热点
+    input: 一周前已被大量账号写完、没有新增证据的新闻
+    expected:
+      timing: late
+      should_require_new_angle_or_reject: true
+
+  - id: B013
+    name: 重复选题
+    input: 与Content Ledger中已有文章同事件同核心角度
+    expected:
+      duplicate_check: duplicate
+      should_reject_unless_new_evidence: true
+
+  - id: B014
+    name: 计算敏感题
+    input: 房贷、收益率、成本回收期等需要自行算账的文章
+    expected:
+      must_record_assumptions: true
+      must_record_formula: true
+      must_not_title_result_without_assumptions: true
