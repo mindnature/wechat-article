@@ -1,21 +1,12 @@
-version: "0.5"
+version: "0.6"
 article_id: "fixture-invalid-broken-evidence"
-account: "思然修远"
+account: "思然知己"
 created_at: ""
 updated_at: ""
-production:
-  mode: standard
-  target_word_count: 1800
-  deadline: ""
-  mode_reason: "故意失败"
-workflow:
-  stage: qa
-  gate: ready
-  blocked_by: []
-  return_to: ""
-  retry_count: 0
+production: {mode: flash, target_word_count: 1200, deadline: "", mode_reason: "故意测试断链"}
+workflow: {stage: writing, gate: ready, blocked_by: [], return_to: "", retry_count: 0}
 signal: {}
-topic: {}
+topic: {tension_test: {status: unknown, contradiction: "", unresolved_question: "", decision_change: "", exclusive_material_path: "", strong_judgment_candidate: "", note: ""}}
 research:
   source_registry:
     - source_id: S001
@@ -37,69 +28,51 @@ research:
       title_safe: true
       note: ""
   calculations: []
-  originality_gate:
-    status: fail
-    assets: []
-    score: 0
-    commodity_content_risk: high
-    missing_original_material: ["需要A级原创资产"]
+  uncertainty_nodes: []
+  depth_material: []
+  originality_gate: {status: conditional, assets: [], score: 0, commodity_content_risk: medium, missing_original_material: []}
 author:
-  why_write: "故意失败样例仍提供作者字段，以确保失败不是因为缺少author。"
-  pov: ["示例判断"]
-  entry_point:
-    type: detail
-    content: "具体入口"
-    evidence_refs: [C001]
+  why_write: ""
+  pov_candidates: []
+  rejected_pov_ids: []
+  selected_pov_id: ""
+  pov: []
+  entry_point: {type: detail, content: "", evidence_refs: [], decision_change: ""}
   personal_material: []
-  material_to_ignore: ["无关背景"]
-  narrative_choice: argument-led
-  voice_profile: "思然修远"
-  voice_traits: ["克制"]
+  material_graveyard: []
+  selection_stats: {retained_units: 0, discarded_units: 0}
+  uncertainty_usage: []
+  narrative_choice: ""
+  voice_profile: ""
+  voice_calibration: uncalibrated
+  voice_traits: []
   preferred_moves: []
   banned_moves: []
   first_person_level: low
   looseness: natural
-  humanity_test:
-    generic_ai_risk: low
-    template_risk: low
-    author_specificity: medium
-    note: ""
+  humanity_test: {generic_ai_risk: unknown, template_risk: unknown, author_specificity: unknown, note: ""}
 architecture: {}
 writing:
   title_candidates: []
   selected_title: "错误示例"
   sections:
     - section_id: W01
-      source_section_id: A01
+      source_section_id: ""
       text: "引用了不存在的证据。"
       claim_ids: [C999]
       calc_ids: []
       case_ids: []
       statement_types: [fact]
   body_status: final
-  word_count: 1800
-  anti_template_pass:
-    status: pass
-    detected_patterns: []
-    edits_made: []
+  word_count: 100
+  generation_trace: {strategy: single_context_fallback, segment_count: 1, isolated_context: false, reorder_pass: false, note: ""}
+  anti_template_pass: {status: pass, detected_patterns: [], edits_made: []}
+  blind_review_packet: {ready: false, body_only: false, anonymous_reference_ids: []}
   risk_notes: []
-visual:
-  planning_status: complete
-  execution_status: unavailable
-  assets_ready: false
-  cover: {}
-  inline_images: []
-  rights_risks: []
-qa:
-  status: A
-  blocking_issues: []
-  recommended_fixes: []
-  voice_review:
-    author_presence: medium
-    template_risk: low
-    voice_match: medium
-publishing:
-  plan_status: not_started
+blind_review: {status: skipped_for_speed, evaluator_independence: unknown, ai_likeness: unknown, voice_consistency: unavailable, findings: [], strongest_human_passages: [], reference_sample_ids: [], note: ""}
+visual: {planning_status: not_started, execution_status: not_started, assets_ready: false, cover: {}, inline_images: [], rights_risks: []}
+qa: {status: not_run, blocking_issues: [], recommended_fixes: [], voice_review: {author_presence: unknown, template_risk: unknown, voice_match: unknown, blind_review_status: not_run}}
+publishing: {plan_status: not_started}
 publication: {}
 performance: {}
 experiment: {}
