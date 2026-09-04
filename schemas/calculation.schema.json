@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "calculation.schema.json",
+  "title": "Calculation Ledger Item",
+  "type": "object",
+  "required": ["calc_id", "question", "assumptions", "formula", "inputs", "result", "verification"],
+  "properties": {
+    "calc_id": {"type": "string", "pattern": "^K[0-9]{3,}$"},
+    "question": {"type": "string", "minLength": 1},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "formula": {"type": "string", "minLength": 1},
+    "inputs": {"type": "object"},
+    "result": {},
+    "sensitivity": {"type": "string"},
+    "verification": {"enum": ["reproduced", "checked", "unchecked"]}
+  }
+}
