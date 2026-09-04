@@ -2,8 +2,9 @@
 name: topic-hunter
 description: 将热点、政策、产品、案例或原始信号加工成适合微信公众号的高潜选题与独特角度，并完成账号路由、竞争扫描与去重判断。
 version: "0.3"
-reads: [signal, account, ledger, learning]
+reads: [signal, account]
 writes: [signal.duplicate_check, topic, status]
+resources: [../../ledger/content-ledger.csv, ../shared/account-profiles.md, ../../learning/account-baselines.yaml]
 ---
 
 # TopicHunter｜爆款选题与角度
@@ -134,6 +135,9 @@ writes: [signal.duplicate_check, topic, status]
 - `signal.duplicate_check`
 - `topic.*`
 - `status: topic_selected`（仅当通过）
+
+### Persistence Patch
+若 Content Ledger / 基线不可访问或不可写，明确标记 `not_persisted`，不得伪装已完成去重或学习。
 
 ## 禁止
 - 看到热点即直接写文章
