@@ -13,8 +13,14 @@ description: <一句话职责>
 version: "0.3"
 reads: [<ArticleState fields>]
 writes: [<ArticleState fields>]
+resources: [<optional external files>]
 ---
 ```
+
+说明：
+- `reads` 只声明从 `ArticleState` 读取的字段；
+- `writes` 只声明向 `ArticleState` 写入的字段；
+- `resources` 声明 Ledger、learning、账号画像等外部持久化资源；没有则可省略。
 
 ## 2. 单一共享状态
 
@@ -30,6 +36,10 @@ writes: [<ArticleState fields>]
 
 1. `Human Summary`：给作者快速阅读；
 2. `State Patch`：仅包含本 Skill 新增或修改的 ArticleState 字段。
+
+涉及外部持久化资源时，额外输出：
+
+3. `Persistence Patch`：明确要写入哪个资源、什么字段；如果运行环境没有写权限，必须标记 `not_persisted`。
 
 禁止让下一 Skill 依靠解析整段散文来猜上一步结论。
 
@@ -63,6 +73,7 @@ writes: [<ArticleState fields>]
   source_ids: [S001]
   verification: verified
   confidence: high
+  title_safe: true
   note: ""
 ```
 
@@ -77,6 +88,7 @@ writes: [<ArticleState fields>]
   question: "..."
   assumptions: []
   formula: "..."
+  inputs: {}
   result: "..."
   verification: reproduced
 ```
