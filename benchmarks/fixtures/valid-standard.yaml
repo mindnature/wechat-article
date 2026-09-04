@@ -1,0 +1,177 @@
+version: "0.4"
+article_id: "fixture-valid-standard"
+account: "思然修远"
+created_at: "2026-09-04T00:00:00+08:00"
+updated_at: "2026-09-04T00:00:00+08:00"
+production:
+  mode: standard
+  target_word_count: 1800
+  deadline: ""
+  mode_reason: "标准文章"
+workflow:
+  stage: qa
+  gate: ready
+  blocked_by: []
+  return_to: ""
+  retry_count: 0
+signal:
+  event: "示例事件"
+  event_date: "2026-09-04"
+  freshness: stable
+  scope: national
+  source_ids: [S001]
+  duplicate_check:
+    status: clear
+    related_article_ids: []
+    note: ""
+topic:
+  target_reader: "30+读者"
+  core_angle: "示例角度"
+  core_conflict: "示例冲突"
+  reader_value: "帮助做判断"
+  market_score: {demand: 3, urgency: 2, conflict: 3, information_gap: 4}
+  account_fit_score: {identity_match: 5, historical_fit: null, actionability: 4}
+  evidence_confidence: high
+  competition:
+    status: partial
+    level: medium
+    scanned_sources: []
+    sampled_competitors: []
+    crowded_angles: []
+    content_gap: "示例"
+  timing: now
+research:
+  source_registry:
+    - source_id: S001
+      title: "官方来源"
+      publisher: "示例机构"
+      url: "https://example.com/source"
+      published_at: "2026-09-04"
+      source_type: official
+      authority: A
+      notes: ""
+  claims:
+    - claim_id: C001
+      text: "已核验事实"
+      type: fact
+      scope: national
+      source_ids: [S001]
+      verification: verified
+      confidence: high
+      title_safe: true
+      note: ""
+  calculations:
+    - calc_id: K001
+      question: "示例计算"
+      assumptions: ["假设A"]
+      formula: "1 + 1"
+      inputs: {a: 1, b: 1}
+      result: 2
+      sensitivity: "无"
+      verification: reproduced
+  cases: []
+  controversy: []
+  limitations: []
+  originality_gate:
+    status: pass
+    assets:
+      - asset_id: O001
+        level: A
+        type: calculation
+        description: "自主计算"
+        evidence_refs: [K001]
+    score: 3
+    commodity_content_risk: low
+    missing_original_material: []
+architecture:
+  core_thesis: "示例核心命题"
+  article_type: "决策算账型"
+  reader_task: "形成判断"
+  structure:
+    - section_id: A01
+      purpose: evidence
+      key_message: "已核验事实"
+      claim_ids: [C001]
+      calc_ids: [K001]
+      case_ids: []
+      statement_types: [fact, calculation]
+      emotion: "理解"
+      visual_node: "V001"
+      transition: ""
+  emotion_curve: ["理解"]
+  visual_nodes: ["V001"]
+writing:
+  title_candidates:
+    - text: "示例标题"
+      claim_ids: [C001]
+      calc_ids: []
+      scope_note: "national"
+      risk: low
+  selected_title: "示例标题"
+  sections:
+    - section_id: W01
+      source_section_id: A01
+      text: "已核验事实。示例计算结果为2。"
+      claim_ids: [C001]
+      calc_ids: [K001]
+      case_ids: []
+      statement_types: [fact, calculation]
+  body_status: final
+  word_count: 1800
+  risk_notes: []
+visual:
+  planning_status: complete
+  execution_status: complete
+  assets_ready: true
+  cover:
+    asset_id: V000
+    status: ready
+    file_ref: "cover.png"
+  inline_images:
+    - asset_id: V001
+      function: explain
+      asset_type: infographic
+      status: ready
+      source_url: ""
+      source_label: "作者整理"
+      rights_status: not_applicable
+      privacy_risk: low
+      file_ref: "img-01.png"
+      notes: ""
+  rights_risks: []
+qa:
+  status: A
+  blocking_issues: []
+  recommended_fixes: []
+publishing:
+  plan_status: not_started
+  final_title: ""
+  final_cover_asset_id: ""
+  summary: ""
+  publish_window: ""
+  urgency: normal
+  channel: wechat_official_account
+  distribution: []
+  followups: []
+  analytics_schedule: ["1h", "24h", "72h"]
+publication:
+  published_at: ""
+  channel: wechat_official_account
+  url: ""
+performance:
+  one_hour: {}
+  twenty_four_hour: {}
+  seventy_two_hour: {}
+  baseline_snapshot: {}
+experiment:
+  experiment_id: ""
+  hypothesis: ""
+  variable: ""
+  variant: ""
+  comparator: ""
+  primary_metric: ""
+  preregistered: false
+learning:
+  observations: []
+  hypotheses: []
+  promoted_rules: []
