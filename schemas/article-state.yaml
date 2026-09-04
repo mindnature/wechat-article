@@ -1,0 +1,94 @@
+version: "0.3"
+article_id: ""
+account: ""
+status: "signal"
+created_at: ""
+updated_at: ""
+
+signal:
+  event: ""
+  event_date: ""
+  freshness: "unknown" # breaking | rising | stable | fading | evergreen | unknown
+  scope: "unknown" # global | national | province | city | institution | company | single_case | unknown
+  source_ids: []
+  duplicate_check:
+    status: "unchecked" # unchecked | clear | related | duplicate
+    related_article_ids: []
+    note: ""
+
+topic:
+  target_reader: ""
+  core_angle: ""
+  core_conflict: ""
+  reader_value: ""
+  market_score:
+    demand: null # 0-5
+    urgency: null # 0-5
+    conflict: null # 0-5
+    information_gap: null # 0-5
+  account_fit_score:
+    identity_match: null # 0-5
+    historical_fit: null # 0-5, N/A before enough history
+    actionability: null # 0-5
+  evidence_confidence: "unknown" # high | medium | low | unknown
+  competition:
+    status: "unverified" # verified | partial | unverified
+    level: "unknown" # low | medium | high | unknown
+    scanned_sources: []
+    crowded_angles: []
+    content_gap: ""
+  timing: "unknown" # now | soon | evergreen | late | unknown
+
+research:
+  source_registry: []
+  claims: []
+  calculations: []
+  cases: []
+  controversy: []
+  limitations: []
+  originality_gate:
+    status: "unchecked" # pass | conditional | fail | unchecked
+    original_value: [] # calculation | test | interview | proprietary_experience | comparison | synthesis | dataset | screenshot | other
+    commodity_content_risk: "unknown" # low | medium | high | unknown
+    missing_original_material: []
+
+architecture:
+  core_thesis: ""
+  article_type: ""
+  reader_task: ""
+  structure: []
+  emotion_curve: []
+  visual_nodes: []
+
+writing:
+  title_candidates: []
+  selected_title: ""
+  body_status: "not_started" # not_started | draft | revised | final
+  word_count: null
+  risk_notes: []
+
+visual:
+  cover: {}
+  inline_images: []
+  rights_risks: []
+
+qa:
+  status: "not_run" # not_run | A | B | C
+  blocking_issues: []
+  recommended_fixes: []
+
+publication:
+  published_at: ""
+  channel: "wechat_official_account"
+  url: ""
+
+performance:
+  one_hour: {}
+  twenty_four_hour: {}
+  seventy_two_hour: {}
+  baseline_snapshot: {}
+
+learning:
+  observations: []
+  hypotheses: []
+  promoted_rules: []

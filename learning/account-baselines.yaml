@@ -1,0 +1,20 @@
+version: "0.3"
+accounts:
+  思然日新:
+    sample_size: 0
+    metrics: {}
+  思然知己:
+    sample_size: 0
+    metrics: {}
+  思然天工:
+    sample_size: 0
+    metrics: {}
+  思然经世:
+    sample_size: 0
+    metrics: {}
+  思然修远:
+    sample_size: 0
+    metrics: {}
+
+# 推荐指标：CTR/阅读转化、完读率、转阅比、赞阅比、关注转化、推荐流量占比。
+# 只有平台真实后台数据才能写入；未知值保持空，不得估算。

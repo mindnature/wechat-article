@@ -1,0 +1,13 @@
+version: "0.3"
+hypotheses: []
+
+# Example
+# - id: H001
+#   account: 思然经世
+#   claim: 标题包含明确金额数字时阅读转化更高
+#   status: testing
+#   level: 1
+#   sample_size: 2
+#   evidence_article_ids: []
+#   counterexamples: []
+#   next_experiment: "连续4篇同题型对照"
