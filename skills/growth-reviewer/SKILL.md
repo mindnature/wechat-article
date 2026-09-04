@@ -2,8 +2,9 @@
 name: growth-reviewer
 description: 把公众号发布数据转成可复用增长经验，更新账号基线、假设和稳定规则，并反向修正生产链。
 version: "0.3"
-reads: [topic, research, architecture, writing, visual, qa, publication, performance, ledger, learning]
+reads: [topic, research, architecture, writing, visual, qa, publication, performance]
 writes: [performance, learning, status]
+resources: [../../ledger/content-ledger.csv, ../../learning/account-baselines.yaml, ../../learning/hypotheses.yaml, ../../learning/proven-patterns.md, ../../learning/rejected-patterns.md]
 ---
 
 # GrowthReviewer｜公众号增长复盘
