@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "learning-rule.schema.json",
+  "title": "Learning Rule",
+  "type": "object",
+  "required": ["rule_id", "level", "account", "pattern", "sample_size", "confidence"],
+  "properties": {
+    "rule_id": {"type": "string"},
+    "level": {"enum": [0, 1, 2, 3]},
+    "account": {"type": "string"},
+    "topic_type": {"type": "string"},
+    "pattern": {"type": "string", "minLength": 1},
+    "sample_size": {"type": "integer", "minimum": 1},
+    "time_window": {"type": "string"},
+    "supporting_article_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "counterexamples": {"type": "array", "items": {"type": "string"}},
+    "confidence": {"enum": ["low", "medium", "high"]},
+    "next_review_at": {"type": "string"}
+  }
+}
