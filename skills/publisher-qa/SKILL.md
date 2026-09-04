@@ -1,10 +1,10 @@
 ---
 name: publisher-qa
-description: 发布前检查事实、独立盲审、视觉与读者交付；新增 Thesis Prominence、First-Screen、Promise→Delivery 和具体任务覆盖硬门。
-version: "0.7"
+description: 发布前检查事实、独立盲审、视觉与读者交付；同时检查 Thesis Prominence、Promise→Delivery、具体任务覆盖和正文段落节奏。
+version: "0.7.1"
 reads: [topic, research, author, architecture, writing, blind_review, visual, account, production, workflow]
 writes: [qa, workflow]
-resources: [../shared/voice-samples/manifest.yaml, ../../docs/BLIND-REVIEW.md, ../../docs/CLARITY-DELIVERY.md]
+resources: [../shared/voice-samples/manifest.yaml, ../../docs/BLIND-REVIEW.md, ../../docs/CLARITY-DELIVERY.md, ../../docs/PARAGRAPH-RHYTHM.md]
 ---
 
 # PublisherQA｜公众号发布前硬质检
@@ -12,7 +12,7 @@ resources: [../shared/voice-samples/manifest.yaml, ../../docs/BLIND-REVIEW.md, .
 ## 前置门
 必须 `workflow.stage: visual`。
 
-Standard/Deep 已通过独立 BlindReview；Flash可跳过。
+Standard/Deep 已通过独立BlindReview；Flash可跳过。
 
 visual.assets_ready=false → 整体最多B，退回visual。
 
@@ -35,10 +35,7 @@ Standard/Deep默认要求：
 - 明确告诉读者会拿到什么框架；
 - 给一个具体事实/场景建立可信度。
 
-检查：
-- 是否被Benchmark缩写、参数、背景复述占满；
-- 是否连续出现读者不需要先知道的术语；
-- 是否300字读完仍说不出文章准备回答什么。
+检查是否被Benchmark缩写、参数、背景复述占满，以及300字读完是否仍说不出文章准备回答什么。
 
 `evidence_overload_first_screen=true` → 最多B。
 
@@ -64,9 +61,7 @@ Standard/Deep默认要求：
 - 小标题应能单独说明本节答案；
 - 读者扫一眼小标题，应能复述全文框架。
 
-Anti-Template只检查微观机械重复：每节同长度、同句式、同反转、同总结。
-
-禁止因为“结构太清楚”要求Writer拆掉编号。
+Anti-Template只检查微观机械重复。禁止因为“结构太清楚”要求Writer拆掉编号。
 
 ## Step 6｜Concrete Delivery
 对于“哪些工作/场景/怎么做”类标题：
@@ -76,34 +71,55 @@ Anti-Template只检查微观机械重复：每节同长度、同句式、同反�
 
 `concrete_task_coverage != pass` → 最多B。
 
-## Step 7｜Evidence / Uncertainty / Originality
-继续执行v0.6硬门：Scope、Calculation、Uxxx真实不确定性、Originality、Tension、Material Graveyard。
+## Step 7｜Paragraph Rhythm Gate｜正文不能碎
+这是 v0.7.1 新增发布门。
+
+先区分：
+- 小标题负责导航；
+- 正文段落负责把一个小意思说完整。
+
+默认要求：
+- 正文以2–4句自然段为主；
+- 单句段落只能少量用于核心结论、转折或必要停顿；
+- 禁止连续3个及以上一句一段；
+- 20字以内极短正文段默认整篇不超过2个，且不能连续；
+- 禁止“算力。数据。场景。融资。”式名词逐行堆叠；
+- 禁止为了拉节奏和滑屏距离把一个正常句群拆成多个段。
+
+机器检查：优先运行 `python scripts/validate_readability.py <article-state>` 或统一入口 `python scripts/validate_article.py <article-state>`。
+
+机器通过仍需手机端肉眼看一遍：如果读者每滑一下只能读到几个字，说明段落仍然过碎。
+
+Paragraph Rhythm失败 → 最多B，退回 writing；修复动作优先为合并段落，而不是改同义词。
+
+## Step 8｜Evidence / Uncertainty / Originality
+继续执行硬门：Scope、Calculation、Uxxx真实不确定性、Originality、Tension、Material Graveyard。
 
 证据服务结论，不要求把所有研究量展示在正文。
 
-## Step 8｜Blind Review
+## Step 9｜Blind Review
 Standard/Deep A的必要条件：
 - blind_review.status=pass
 - evaluator_independence=fresh_session|different_model
 - ai_likeness != high
 - 无未解决high finding
 
-BlindReview负责语感与AI感，不能替代Clarity/Promise检查。
+BlindReview负责语感与AI感，不能替代Clarity/Promise/Paragraph Rhythm检查。
 
-## Step 9｜Writer Process Audit
+## Step 10｜Writer Process Audit
 检查 segmented generation、reorder/delete pass、Anti-Template pass。
 
 single_context_fallback不是直接失败，但提高BlindReview权重。
 
-## Step 10｜视觉就绪
+## Step 11｜视觉就绪
 A必须assets_ready=true；封面/文中必需图ready，无严重版权隐私风险。
 
 ## 最终评级
 ### A
-事实 + Scope + Originality + Thesis Prominence + Promise Delivery + Concrete Delivery + BlindReview + Visual 全部通过。
+事实 + Scope + Originality + Thesis Prominence + Promise Delivery + Concrete Delivery + Paragraph Rhythm + BlindReview + Visual 全部通过。
 
 ### B
-最常见：结论埋太深、标题承诺未完整兑现、编号框架不清、具体任务不足、盲审pending、视觉未完成。
+最常见：结论埋太深、标题承诺未完整兑现、具体任务不足、正文过碎、盲审pending、视觉未完成。
 
 ### C
 核心事实失证、严重Scope错误、标题承诺实质误导、证据断裂、关键计算错误。
@@ -118,6 +134,7 @@ A必须assets_ready=true；封面/文中必需图ready，无严重版权隐私�
   - promise_delivery
   - macro_structure
   - concrete_delivery
+  - paragraph_rhythm
 - qa.voice_review.blind_review_status
 
 A → workflow.stage=qa, gate=ready。
@@ -125,6 +142,8 @@ A → workflow.stage=qa, gate=ready。
 ## 禁止
 - 同一上下文自己写、自己评、自己给A
 - 把1234编号当成AI味
+- 把几个字一段当成“人味”
+- 允许连续一句一段制造伪节奏
 - 只审语气、不审标题承诺有没有兑现
 - 允许核心观点埋到后半篇
 - 允许“哪些工作”只写成几个抽象大类
