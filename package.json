@@ -1,0 +1,10 @@
+{
+  "name": "wechat-article",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev": "pnpm --filter @wechat-article/web dev",
+    "build": "pnpm --filter @wechat-article/web build",
+    "lint": "pnpm --filter @wechat-article/web lint"
+  }
+}
